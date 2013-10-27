@@ -1,0 +1,112 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/scrollView1"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" >
+
+    <LinearLayout
+        android:id="@+id/scrollViewContents"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <AutoCompleteTextView
+            android:id="@+id/dailyProgressLocationEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:ems="10"
+            android:hint="@string/dailyProgressLocation"
+            android:inputType="textCapWords" >
+
+        </AutoCompleteTextView>
+
+        <EditText
+            android:id="@+id/dailyProgressActivityEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:ems="10"
+            android:hint="@string/dailyProgressActivity"
+            android:inputType="textCapWords" >
+
+        </EditText>
+
+        <LinearLayout
+            android:id="@+id/dailyProgressProgressLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp" >
+
+            <EditText
+                android:id="@+id/dailyProgressProgressEditText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:ems="10"
+                android:hint="@string/dailyProgressProgress"
+                android:inputType="number" />
+
+            <Spinner
+                android:id="@+id/dailyProgressOnTimeSpinner"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginRight="5dp"
+                android:layout_weight="0.5"
+                android:entries="@array/dailyProgressOnTimeSpinner" />
+        </LinearLayout>
+
+        <EditText
+            android:id="@+id/dailyProgressDescriptionEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:ems="10"
+            android:gravity="top|left"
+            android:hint="@string/dailyProgressDescription"
+            android:inputType="textMultiLine|textCapSentences"
+            android:minLines="4" />
+
+        <uk.co.simon.app.ui.customElements.ExpandableHeightGridView
+            android:id="@+id/dailyProgressPhotosGrid"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:columnWidth="150px"
+            android:horizontalSpacing="10dp"
+            android:numColumns="auto_fit"
+            android:padding="5dp"
+            android:scrollbars="none"
+            android:stretchMode="columnWidth"
+            android:verticalSpacing="10dp" />
+
+        <LinearLayout
+            android:id="@+id/dailyProgressPhotography"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp" >
+
+            <Button
+                android:id="@+id/dailyProgressTakePhotoButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="5dp"
+                android:layout_weight="0.5"
+                android:text="@string/dailyProgressTakePhoto" />
+
+            <Button
+                android:id="@+id/dailyProgressAttachPhotoButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_weight="0.5"
+                android:text="@string/dailyProgressAttachPhoto" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+</ScrollView>

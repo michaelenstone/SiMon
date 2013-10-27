@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory android:title="User" >
+        <EditTextPreference
+            android:key="NamePref"
+            android:summary="@string/preferencesNameSummary"
+            android:title="@string/preferencesName" />
+        <EditTextPreference
+            android:key="EmailPref"
+            android:summary="@string/preferencesEmailSummary"
+            android:title="@string/preferencesEmail" />
+        <EditTextPreference
+            android:key="PasswordPref"
+            android:summary="@string/preferencesPasswordSummary"
+            android:title="@string/preferencesPassword"   
+    		android:inputType="textPassword" />
+        <uk.co.simon.app.ui.customElements.IntEditTextPreference
+            android:key="UserID"
+            android:summary="@string/preferencesUserIDSummary"
+            android:title="@string/preferencesUserID"
+            android:numeric="integer" />
+        <uk.co.simon.app.ui.customElements.IntEditTextPreference
+            android:key="ProjectLimit"
+            android:summary="@string/preferencesProjectLimitSummary"
+            android:title="@string/preferencesProjectLimit"
+            android:numeric="integer" />
+        <uk.co.simon.app.ui.customElements.IntEditTextPreference
+            android:key="PhotoStorage"
+            android:summary="@string/preferencesPhotoStorageSummary"
+            android:title="@string/preferencesPhotoStorage"
+            android:numeric="integer" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

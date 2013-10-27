@@ -1,0 +1,30 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/projectEntryLinearLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal"
+    android:layout_margin="5dp"
+    android:orientation="vertical" >
+
+    <EditText
+        android:id="@+id/projectEntryProjectNameEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:ems="10"
+        android:hint="@string/projectEntryProjectName"
+        android:inputType="textCapWords" >
+
+        <requestFocus />
+    </EditText>
+
+    <EditText
+        android:id="@+id/projectEntryProjectNumberEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:ems="10"
+        android:hint="@string/projectEntryProjectNumber"
+        android:inputType="textCapCharacters" />
+
+</LinearLayout>

@@ -1,0 +1,111 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <LinearLayout
+        android:id="@+id/dailyProgressProjectLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="5dp" >
+
+        <TextView
+            android:id="@+id/dailyProgressProjectText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:layout_weight="0.25"
+            android:text="@string/dailyProgressProject"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <Spinner
+            android:id="@+id/dailyProgressProjectSpinner"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:layout_weight="0.75" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/dailyProgressDateButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/dailyProgressProjectLayout"
+        android:layout_margin="5dp"
+        android:gravity="center"
+        android:onClick="onClickProgressHeader"
+        android:text="@string/dailyProgressDate" />
+
+    <EditText
+        android:id="@+id/dailyProgressSupervisor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/dailyProgressDateButton"
+        android:layout_margin="5dp"
+        android:ems="10"
+        android:hint="@string/dailyProgressSupervisor"
+        android:inputType="text" >
+
+    </EditText>
+
+    <EditText
+        android:id="@+id/dailyProgressReportRefEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/dailyProgressSupervisor"
+        android:layout_margin="5dp"
+        android:hint="@string/dailyProgressReportRef"
+        android:inputType="text" />
+
+    <LinearLayout
+        android:id="@+id/dailyProgressWeatherLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="false"
+        android:layout_below="@id/dailyProgressReportRefEditText"
+        android:layout_margin="5dp" >
+
+        <EditText
+            android:id="@+id/dailyProgressWeatherEditText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.6"
+            android:ems="10"
+            android:hint="@string/dailyProgressWeather"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/dailyProgressTempEditText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_weight="0.25"
+            android:ems="10"
+            android:hint="@string/dailyProgressTemp"
+            android:inputType="numberDecimal" />
+
+        <Spinner
+            android:id="@+id/dailyProgressTempSpinner"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginRight="5dp"
+            android:layout_weight="0.15"
+            android:entries="@array/dailyProgressTempType" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/dailyProgressLabourButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/dailyProgressWeatherLayout"
+        android:layout_margin="5dp"
+        android:gravity="center"
+        android:onClick="onClickProgressHeader"
+        android:text="@string/dailyProgressLabour"
+        android:visibility="gone" />
+
+</RelativeLayout>

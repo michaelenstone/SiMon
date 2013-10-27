@@ -1,0 +1,61 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <ImageView
+        android:id="@+id/homeLogo"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="false"
+        android:layout_marginTop="25dp"
+        android:contentDescription="@string/homeLogoDescription"
+        android:src="@drawable/logo" />
+    
+    <LinearLayout
+        android:id="@+id/homeVerticalLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="false"
+        android:layout_centerHorizontal="false"
+        android:layout_centerVertical="false"
+        android:layout_marginTop="130dp"
+        android:orientation="vertical" >
+        
+    <Button
+        android:id="@+id/homeButtonProgress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:onClick="onClickHome"
+        android:text="@string/homeButtonProgress" />
+
+    <Button
+        android:id="@+id/homeButtonSVR"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:text="@string/homeButtonSVR" 
+        android:onClick="onClickHome"/>
+
+    <Button
+        android:id="@+id/homeButtonOpen"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:text="@string/homeButtonOpen" 
+        android:onClick="onClickHome"/>
+
+    <Button
+        android:id="@+id/homeButtonProjects"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:onClick="onClickHome"
+        android:text="@string/homeButtonProjects" />
+    
+    </LinearLayout>
+
+</RelativeLayout>
