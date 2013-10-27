@@ -1,0 +1,17 @@
+SiMon is an android App that interfaces with the SiMon web service found at www.simon-app.com.  
+The application is designed for construction professionals to allow them to monitor and report on progress on site. 
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+This work has been licensed under two licenses covering the packages contained within:
+
+net.bican.wordpress is from Can Bican and is covered by the Creative Commons 3.0 BY-SA license
+uk.co.simon.app.wordpress is derived from this and is also covered by Creative Commons 3.0 BY-SA
+all other packages are licensed under GNU General Public License, version 2 (GPL-2.0)
+
