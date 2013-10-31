@@ -1,5 +1,6 @@
 package uk.co.simon.app;
 
+import uk.co.simon.app.filesAndSync.xmlrpcCheckTask;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -30,6 +31,10 @@ public class OptionsMenu {
 		case R.id.menuSettings:
 			Intent openSettings = new Intent(activity, ActivitySettings.class);
 			activity.startActivity(openSettings);
+			return true;
+		case R.id.menuSync:
+			xmlrpcCheckTask mTask = new xmlrpcCheckTask(context, activity);
+			mTask.execute((Void) null);
 			return true;
 		case R.id.menuLogout:
 			SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);

@@ -1,15 +1,16 @@
 package uk.co.simon.app;
 
+import uk.co.simon.app.filesAndSync.xmlrpcCheckTask;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import com.bugsense.trace.BugSenseHandler;
 
@@ -24,8 +25,11 @@ public class ActivityHome extends Activity {
 		setContentView(R.layout.activity_home); 
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		context = this;
-		xmlrpcCheckTask mTask = new xmlrpcCheckTask();
-		mTask.execute((Void) null);
+		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+		if (sharedPref.getBoolean("SyncPref", false)) {
+			xmlrpcCheckTask mTask = new xmlrpcCheckTask(context, this);
+			mTask.execute((Void) null);
+		}
 	}
 
 	public void onClickHome(View view) {
@@ -76,25 +80,5 @@ public class ActivityHome extends Activity {
 	@Override
 	protected void onPause() {
 		super.onPause();
-	}
-
-	public class xmlrpcCheckTask extends AsyncTask<Void, Void, Boolean> {
-
-		@Override
-		protected Boolean doInBackground(Void... params) {
-
-			//Sync sync = new Sync(context);
-			//return sync.projectSync();
-			return true;
-		}
-
-		@Override
-		protected void onPostExecute(final Boolean success) {		    
-			if (success) {
-				Toast toast = Toast.makeText(context, getString(R.string.msgSyncSuccess), Toast.LENGTH_SHORT);
-				toast.show();
-			}
-		}
-
 	}
 }

@@ -2,11 +2,13 @@
 
     <item
         android:id="@+id/menuHome"
-        android:title="@string/menuHome">
-    </item>
+        android:title="@string/menuHome"/>
     <item
         android:id="@+id/menuSettings"
         android:title="@string/menuSettings"/>
+    <item
+        android:id="@+id/menuSync"
+        android:title="@string/menuSync"/>
     <item
         android:id="@+id/menuLogout"
         android:title="@string/menuLogout"/>

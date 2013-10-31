@@ -6,19 +6,16 @@
     <string name="menuSettings">Settings</string>
     <string name="menuHome">Home</string>
     <string name="menuChangeReportType">Change Report Type</string>    
-    <string name="menuLogout">Logout</string>
+    <string name="menuLogout">Logout</string>    
+    <string name="menuSync">Sync Projects and Locations</string>
     <string name="preferencesName">Name</string>
     <string name="preferencesNameSummary">Enter Name to be used in Author Field on Submissions</string>
     <string name="preferencesEmail">Email</string>
     <string name="preferencesEmailSummary">Enter the Email you use as a username for SiMon online</string>
     <string name="preferencesPassword">Password</string>
     <string name="preferencesPasswordSummary">Enter the Password you use to login to SiMon online</string>
-    <string name="preferencesUserID">UserID</string>
-    <string name="preferencesUserIDSummary">Wordpress UserID for error checking only DO NOT CHANGE</string>
-    <string name="preferencesProjectLimit">Project Limit</string>
-    <string name="preferencesProjectLimitSummary">Wordpress ProjectLimit for error checking only DO NOT CHANGE</string>
-    <string name="preferencesPhotoStorage">Photo Storage Limit</string>
-    <string name="preferencesPhotoStorageSummary">Wordpress Photo Storage Limit for error checking only DO NOT CHANGE</string>
+    <string name="preferencesApplicationSync">Automatically sync Projects and Locations</string>
+    <string name="preferencesApplicationSyncSummary">Select this option to automatically sync yourprojects and locations on start - This option may incur additional data costs</string>
       
     <!-- Strings for Alert Dialogs -->
     <string name="alert_dialog_ok">OK</string>

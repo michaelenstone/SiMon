@@ -11,25 +11,16 @@
             android:summary="@string/preferencesEmailSummary"
             android:title="@string/preferencesEmail" />
         <EditTextPreference
+            android:inputType="textPassword"
             android:key="PasswordPref"
             android:summary="@string/preferencesPasswordSummary"
-            android:title="@string/preferencesPassword"   
-    		android:inputType="textPassword" />
-        <uk.co.simon.app.ui.customElements.IntEditTextPreference
-            android:key="UserID"
-            android:summary="@string/preferencesUserIDSummary"
-            android:title="@string/preferencesUserID"
-            android:numeric="integer" />
-        <uk.co.simon.app.ui.customElements.IntEditTextPreference
-            android:key="ProjectLimit"
-            android:summary="@string/preferencesProjectLimitSummary"
-            android:title="@string/preferencesProjectLimit"
-            android:numeric="integer" />
-        <uk.co.simon.app.ui.customElements.IntEditTextPreference
-            android:key="PhotoStorage"
-            android:summary="@string/preferencesPhotoStorageSummary"
-            android:title="@string/preferencesPhotoStorage"
-            android:numeric="integer" />
+            android:title="@string/preferencesPassword" />
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="SyncPref"
+            android:summary="@string/preferencesApplicationSync"
+            android:title="@string/preferencesApplicationSyncSummary" />
     </PreferenceCategory>
 
 </PreferenceScreen>
