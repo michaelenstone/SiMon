@@ -3,6 +3,8 @@ package uk.co.simon.app;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.bugsense.trace.BugSenseHandler;
+
 import uk.co.simon.app.adapters.AdapterProjects;
 import uk.co.simon.app.sqllite.DataSourceProjects;
 import uk.co.simon.app.sqllite.DataSourceReports;
@@ -29,6 +31,8 @@ public class ActivityProjects extends FragmentActivity implements uk.co.simon.ap
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+		BugSenseHandler.initAndStartSession(ActivityProjects.this, "6c6b0664");
         setContentView(R.layout.activity_projects);
         setTitle(R.string.title_activity_projects);
         

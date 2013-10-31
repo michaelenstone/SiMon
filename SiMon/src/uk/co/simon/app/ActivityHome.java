@@ -11,6 +11,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.bugsense.trace.BugSenseHandler;
+
 public class ActivityHome extends Activity {
 
 	Context context = null;
@@ -18,6 +20,7 @@ public class ActivityHome extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		BugSenseHandler.initAndStartSession(ActivityHome.this, "6c6b0664");
 		setContentView(R.layout.activity_home); 
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		context = this;

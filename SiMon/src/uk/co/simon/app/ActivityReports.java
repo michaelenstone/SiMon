@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.bugsense.trace.BugSenseHandler;
+
 import uk.co.simon.app.adapters.AdapterReports;
 import uk.co.simon.app.filesAndSync.PDFCreator;
 import uk.co.simon.app.filesAndSync.UploadReport;
@@ -33,6 +35,8 @@ public class ActivityReports extends FragmentActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+		BugSenseHandler.initAndStartSession(ActivityReports.this, "6c6b0664");
         setContentView(R.layout.activity_reports);
         setTitle(R.string.title_activity_reports);
         

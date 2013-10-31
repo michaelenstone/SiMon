@@ -1,5 +1,7 @@
 package uk.co.simon.app.sqllite;
 
+import java.io.File;
+
 public class SQLReport {
 	private long id;
 	private long projectId = 0;
@@ -92,8 +94,9 @@ public class SQLReport {
 	}
 
 	public void setPDF(String Path) {
-		PDF = Path;
-		if (Path != null) {
+		File pdf = new File(Path);
+		if (pdf.exists()) {
+			PDF = Path;
 			hasPDF = true;
 		}
 	}

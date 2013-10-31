@@ -9,6 +9,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Timer;
 
+import com.bugsense.trace.BugSenseHandler;
+
 import uk.co.simon.app.filesAndSync.FileManager;
 import uk.co.simon.app.sensors.mySensorEventListener;
 import uk.co.simon.app.sqllite.DataSourcePhotos;
@@ -63,6 +65,8 @@ public class ActivityTakePhoto extends Activity implements SurfaceHolder.Callbac
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		BugSenseHandler.initAndStartSession(ActivityTakePhoto.this, "6c6b0664");
 		setContentView(R.layout.activity_take_photo);
 
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);

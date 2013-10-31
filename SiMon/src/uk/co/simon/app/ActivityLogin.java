@@ -2,6 +2,8 @@ package uk.co.simon.app;
 
 import java.net.MalformedURLException;
 
+import com.bugsense.trace.BugSenseHandler;
+
 import redstone.xmlrpc.XmlRpcFault;
 import uk.co.simon.app.wordpress.SiMonUser;
 import uk.co.simon.app.wordpress.SiMonWordpress;
@@ -53,6 +55,7 @@ public class ActivityLogin extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		BugSenseHandler.initAndStartSession(ActivityLogin.this, "6c6b0664");
 		context = this;
 		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
 		String mEmail = sharedPref.getString("EmailPref", null);

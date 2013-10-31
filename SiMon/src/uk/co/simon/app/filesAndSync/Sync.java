@@ -1,9 +1,22 @@
 package uk.co.simon.app.filesAndSync;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
-import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.entity.mime.content.StringBody;
+import org.apache.http.impl.client.DefaultHttpClient;
 
 import redstone.xmlrpc.XmlRpcFault;
 import uk.co.simon.app.ActivityLogin;
@@ -21,7 +34,6 @@ import uk.co.simon.app.sqllite.SQLReportItem;
 import uk.co.simon.app.wordpress.SiMonUser;
 import uk.co.simon.app.wordpress.SiMonWordpress;
 import uk.co.simon.app.wordpress.WPLocation;
-import uk.co.simon.app.wordpress.WPPhotoUpload;
 import uk.co.simon.app.wordpress.WPProject;
 import android.content.Context;
 import android.content.Intent;
@@ -63,54 +75,58 @@ public class Sync {
 			DataSourceProjects datasource = new DataSourceProjects(context);
 			datasource.open();
 			List<SQLProject> projects = datasource.getAllProjects();
-			if (!projects.isEmpty()) {
-				for (SQLProject project : projects) {
-					try {
-						project.setCloudID(wp.uploadProject(project));
-						datasource.updateProject(project);
-						locationSync(project);
-					} catch (XmlRpcFault e) {
-						if (e.getMessage().contains("invalid") && e.getMessage().contains("password")) {
-							SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-							SharedPreferences.Editor editor = sharedPref.edit();
-							editor.putString("PasswordPref", null);
-							editor.commit();
-							Intent login = new Intent(context, ActivityLogin.class);
-							context.startActivity(login);
-							return false;
-						} else if (e.getMessage().contains("Project Limit Reached")) {
-							Toast toast = Toast.makeText(context, context.getString(R.string.errProjectServerLimit), Toast.LENGTH_SHORT);
-							toast.show();
-							return false;
-						}
-						e.printStackTrace();
-					}
-				}
-			}
 			try {
 				List<WPProject> WPProjects = wp.getProjects();
-				int counter = 0;
+				List<SQLProject> projectsNotOnServer = new ArrayList<SQLProject>();
+				List<SQLProject> projectsNotOnDevice = new ArrayList<SQLProject>();
+				projectsNotOnServer.addAll(projects);
 				for (WPProject project : WPProjects) {
+					SQLProject sqlProject = datasource.getProjectFromCloudId(project.getCloudID());
+					if (sqlProject == null) {
+						projectsNotOnDevice.add(sqlProject);
+					} else {
+						projectsNotOnServer.remove(sqlProject);
+					}
+				}
+				int counter = 0;
+				for (SQLProject project : projectsNotOnDevice) {
+					if (projects.size()+counter<projectLimit) {
+						datasource.createProject(project);
+						counter++;
+					} else {
+						wp.projectLimit(project);
+						Toast toast = Toast.makeText(context, context.getString(R.string.errProjectDeviceLimit) 
+								+ project.getProject(), Toast.LENGTH_SHORT);
+						toast.show();
+					}
+				}
+				for (SQLProject project : projectsNotOnServer) {
+					project.setCloudID(wp.uploadProject(project));
 					if (project.getCloudID()>-1) {
-						SQLProject SQLproject = project.toSQLProject();
-						if (datasource.getProjectFromCloudId(SQLproject.getCloudID()) == null) {	
-							if (projects.size()+counter<projectLimit) {
-								datasource.createProject(SQLproject);
-								locationSync(SQLproject);
-								counter++;
-							} else {
-								wp.deleteProject(SQLproject);
-								Toast toast = Toast.makeText(context, context.getString(R.string.errProjectDeviceLimit) 
-										+ SQLproject.getProject(), Toast.LENGTH_SHORT);
-								toast.show();
-							}
-						}
+						datasource.updateProject(project);
+					} else {
+						Toast toast = Toast.makeText(context, context.getString(R.string.errProjectServerLimit) 
+								+ project.getProject(), Toast.LENGTH_SHORT);
+						toast.show();
+						return true;
 					}
 				}
 			} catch (XmlRpcFault e) {
+				if (e.getMessage().contains("invalid") && e.getMessage().contains("password")) {
+					SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+					SharedPreferences.Editor editor = sharedPref.edit();
+					editor.putString("PasswordPref", null);
+					editor.commit();
+					Intent login = new Intent(context, ActivityLogin.class);
+					context.startActivity(login);
+					return false;
+				}
 				e.printStackTrace();
 			}
-
+			List<SQLProject> syncedProjects = datasource.getAllProjects();
+			for (SQLProject project : syncedProjects) {
+				locationSync(project);
+			}
 			datasource.close();
 			return true;
 		} else {
@@ -124,41 +140,40 @@ public class Sync {
 			DataSourceLocations datasource = new DataSourceLocations(context);
 			datasource.open();
 			List<SQLLocation> locations = datasource.getAllProjectLocations(project.getId());
-			long highestCloudID = 0;
-			if (!locations.isEmpty()) {
-				for (SQLLocation location : locations) {
-					try {
-						location.setCloudID(wp.uploadLocation(location, project.getCloudID()));
-						datasource.updateLocation(location);
-					} catch (XmlRpcFault e) {
-						if (e.getMessage().contains("invalid") && e.getMessage().contains("password")) {
-							SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-							SharedPreferences.Editor editor = sharedPref.edit();
-							editor.putString("PasswordPref", null);
-							editor.commit();
-							Intent login = new Intent(context, ActivityLogin.class);
-							context.startActivity(login);
-							return false;
-						}
-						e.printStackTrace();
-					}
-					if (location.getCloudID() > highestCloudID ) highestCloudID = location.getCloudID();
-				}
-			}
 			try {
-				List<WPLocation> WPLocations = wp.getLocations(project.getCloudID(), highestCloudID);
+				List<WPLocation> WPLocations = wp.getLocations(project.getCloudID());
+				List<SQLLocation> locationsNotOnServer = new ArrayList<SQLLocation>();
+				List<SQLLocation> locationsNotOnDevice = new ArrayList<SQLLocation>();
+				locationsNotOnServer.addAll(locations);
 				for (WPLocation location : WPLocations) {
 					if (location.getCloudID()>-1){
 						SQLLocation SQLlocation = location.toSQLLocation();
-						if (datasource.getLocationFromCloudId(SQLlocation.getCloudID()) == null) {
-							datasource.createLocation(SQLlocation);
+						if (SQLlocation == null) {
+							locationsNotOnDevice.add(SQLlocation);
+						} else {
+							locationsNotOnServer.remove(SQLlocation);
 						}
 					}
 				}
+				for (SQLLocation location : locationsNotOnDevice) {
+					datasource.createLocation(location);
+				}
+				for (SQLLocation location : locationsNotOnServer) {
+					location.setCloudID(wp.uploadLocation(location, project.getCloudID()));
+					datasource.updateLocation(location);
+				}
 			} catch (XmlRpcFault e) {
+				if (e.getMessage().contains("invalid") && e.getMessage().contains("password")) {
+					SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+					SharedPreferences.Editor editor = sharedPref.edit();
+					editor.putString("PasswordPref", null);
+					editor.commit();
+					Intent login = new Intent(context, ActivityLogin.class);
+					context.startActivity(login);
+					return false;
+				}
 				e.printStackTrace();
 			}
-
 			datasource.close();
 			return true;
 		} else {
@@ -174,6 +189,9 @@ public class Sync {
 			datasource.close();
 			try {
 				report.setCloudID(wp.uploadReport(report, project.getCloudID()));
+				if (report.hasPDF()) {
+					uploadPDF(report);
+				}
 				DataSourceReports datasourceReports = new DataSourceReports(context);
 				datasourceReports.open();
 				datasourceReports.updateReport(report);
@@ -234,34 +252,45 @@ public class Sync {
 			return false;
 		}
 	}
-	
+
 	public boolean uploadPhotos(SQLReportItem reportItem, long projectCloudID, long locationCloudID) {
 		if(networkIsAvailable()) {
 			DataSourcePhotos datasource = new DataSourcePhotos(context);
 			datasource.open();
 			List<SQLPhoto> photos = datasource.getReportItemPhotos(reportItem.getId());
 			for (SQLPhoto photo : photos) {
+				HttpClient httpclient = new DefaultHttpClient();
+				HttpPost httppost = new HttpPost(
+						"http://www.simon-app.com/wp-content/plugins/SiMon%20Plugin/Upload.php?photo=set");
+
 				try {
-					WPPhotoUpload photoUpload = wp.uploadPhoto(photo.getCloudID(), reportItem.getCloudID(), projectCloudID, locationCloudID);
-					photo.setCloudID(photoUpload.getCloudID());
-					if (!photoUpload.getStatus().contains("Exists")){
-						File photoFile = new File(photo.getPhotoPath());
-						String response = wp.uploadPhotoFile(URLConnection.guessContentTypeFromName(photoFile.getName()), photoFile, photo.getCloudID());
-						if (response.contains("Error")) {
-							Log.w("Photo Upload Error", response);
-						}
+					MultipartEntity entity = new MultipartEntity();
+
+					entity.addPart("report_item_id", new StringBody(String.valueOf(reportItem.getCloudID())));
+					entity.addPart("project_id", new StringBody(String.valueOf(projectCloudID)));
+					entity.addPart("location_id", new StringBody(String.valueOf(locationCloudID)));
+					entity.addPart("user_id", new StringBody(String.valueOf(userID)));
+
+
+					File file = new File(photo.getPhotoPath());
+					entity.addPart("image", new FileBody(file,"image/jpeg"));
+
+					httppost.setEntity(entity);
+					HttpResponse response = httpclient.execute(httppost);
+
+					HttpEntity resEntity = response.getEntity();
+
+					BufferedReader reader = new BufferedReader(new InputStreamReader(
+							resEntity.getContent(), "UTF-8"));
+					String sResponse;
+					StringBuilder s = new StringBuilder();
+
+					while ((sResponse = reader.readLine()) != null) {
+						s = s.append(sResponse);
 					}
-				} catch (XmlRpcFault e) {
-					if (e.getMessage().contains("invalid") && e.getMessage().contains("password")) {
-						SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-						SharedPreferences.Editor editor = sharedPref.edit();
-						editor.putString("PasswordPref", null);
-						editor.commit();
-						Intent login = new Intent(context, ActivityLogin.class);
-						context.startActivity(login);
-						return false;
-					}
-					e.printStackTrace();
+					Log.w("test", "Response: " + s);
+				} catch (ClientProtocolException e) {
+				} catch (IOException e) {
 				}
 			}
 			datasource.close();
@@ -270,7 +299,45 @@ public class Sync {
 			return false;
 		}
 	}
-	
+
+	public boolean uploadPDF(SQLReport report) {
+		if(networkIsAvailable()) {
+			HttpClient httpclient = new DefaultHttpClient();
+			HttpPost httppost = new HttpPost(
+					"http://www.simon-app.com/wp-content/plugins/SiMon%20Plugin/Upload.php?pdf=set");
+
+			try {
+				MultipartEntity entity = new MultipartEntity();
+
+				entity.addPart("user_id", new StringBody(String.valueOf(userID)));
+				entity.addPart("report_id", new StringBody(String.valueOf(report.getCloudID())));
+
+				File file = new File(report.getPDF());
+				entity.addPart("image", new FileBody(file,"application/pdf"));
+
+				httppost.setEntity(entity);
+				HttpResponse response = httpclient.execute(httppost);
+
+				HttpEntity resEntity = response.getEntity();
+
+				BufferedReader reader = new BufferedReader(new InputStreamReader(
+						resEntity.getContent(), "UTF-8"));
+				String sResponse;
+				StringBuilder s = new StringBuilder();
+
+				while ((sResponse = reader.readLine()) != null) {
+					s = s.append(sResponse);
+				}
+				Log.w("test", "Response: " + s);
+			} catch (ClientProtocolException e) {
+			} catch (IOException e) {
+			}
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 	public boolean networkIsAvailable() {
 		ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo networkInfo = cm.getActiveNetworkInfo();

@@ -334,7 +334,7 @@ public class DialogFragmentReportItem extends DialogFragment {
 				
 				cursor.close();
 				SQLPhoto newPhoto = new SQLPhoto();
-				newPhoto.setPhoto(imgFilePath);
+				newPhoto.setPhoto(destinationFile.getAbsolutePath());
 				newPhoto.setReportItemId(thisReportItem.getId());
 				newPhoto.setLocationId(thisReportItem.getLocationId());
 				photosDatasource = new DataSourcePhotos(getActivity());

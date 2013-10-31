@@ -1,15 +1,9 @@
 package uk.co.simon.app.wordpress;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
-import net.bican.wordpress.Attachment;
 import net.bican.wordpress.Wordpress;
 import redstone.xmlrpc.XmlRpcArray;
 import redstone.xmlrpc.XmlRpcFault;
@@ -35,55 +29,6 @@ public class SiMonWordpress extends Wordpress {
 		this.simon = (SiMon) XmlRpcProxy.createProxy(url, "SiMon", new Class[] { SiMon.class }, true);
 	}
 	
-	private static byte[] getBytesFromFile(File file) {
-	    byte[] result = null;
-	    InputStream is = null;
-	    try {
-	      is = new FileInputStream(file);
-
-	      // Get the size of the file
-	      long length = file.length();
-
-	      // You cannot create an array using a long type.
-	      // It needs to be an int type.
-	      // Before converting to an int type, check
-	      // to ensure that file is not larger than Integer.MAX_VALUE.
-	      if (length > Integer.MAX_VALUE) {
-	        // File is too large
-	      }
-
-	      // Create the byte array to hold the data
-	      byte[] bytes = new byte[(int) length];
-
-	      // Read in the bytes
-	      int offset = 0;
-	      int numRead = 0;
-	      while (offset < bytes.length
-	          && (numRead = is.read(bytes, offset, bytes.length - offset)) >= 0) {
-	        offset += numRead;
-	      }
-
-	      // Ensure all the bytes have been read in
-	      if (offset < bytes.length) {
-	        throw new IOException(
-	            "Could not completely read file " + file.getName()); //$NON-NLS-1$
-	      }
-	      result = bytes;
-	    } catch (FileNotFoundException e) {
-	      e.printStackTrace();
-	    } catch (IOException e) {
-	      e.printStackTrace();
-	    } finally {
-	      if (is != null)
-	        try {
-	          is.close();
-	        } catch (IOException e) {
-	          e.printStackTrace();
-	        }
-	    }
-	    return result;
-	  }
-	
 	@SuppressWarnings("unchecked")
 	public List<WPProject> getProjects() throws XmlRpcFault {
 		XmlRpcArray r = this.simon.getProjects(super.username, super.password);
@@ -95,14 +40,14 @@ public class SiMonWordpress extends Wordpress {
 				project.getCloudID(), project.getProject(), project.getProjectNumber());
 	}
 	
-	public int deleteProject(SQLProject project) throws XmlRpcFault {
-		return this.simon.deleteProject(this.username, this.password, 
+	public int projectLimit(SQLProject project) throws XmlRpcFault {
+		return this.simon.projectLimit(this.username, this.password, 
 				project.getCloudID());
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<WPLocation> getLocations(long projectId, long searchFrom) throws XmlRpcFault {
-		XmlRpcArray r = this.simon.getLocations(super.username, super.password, projectId, searchFrom);
+	public List<WPLocation> getLocations(long projectId) throws XmlRpcFault {
+		XmlRpcArray r = this.simon.getLocations(super.username, super.password, projectId);
 		return super.fillFromXmlRpcArray(r, WPLocation.class);
 	}
 	
@@ -124,24 +69,6 @@ public class SiMonWordpress extends Wordpress {
 				reportItem.getOnTIme());
 	}
 	
-	public WPPhotoUpload uploadPhoto(long cloudID, long reportItemCloudID, long projectCloudID, long locationCloudID) throws XmlRpcFault {
-		XmlRpcStruct r = this.simon.uploadPhoto(this.username, this.password, cloudID, reportItemCloudID, projectCloudID, locationCloudID);
-		WPPhotoUpload result = new WPPhotoUpload();
-	    result.fromXmlRpcStruct(r);
-	    return result;
-	}
-	
-	public String uploadPhotoFile(String mimeType, File file,
-		      long cloudID) throws XmlRpcFault {
-		    Attachment att = new Attachment();
-		    att.setType(mimeType);
-		    att.setOverwrite(true);
-		    att.setName(file.getName());
-		    att.setBits(getBytesFromFile(file));
-		    XmlRpcStruct d = att.toXmlRpcStruct();
-		    return this.simon.uploadPhotoFile(this.username, this.password, d, cloudID);
-		  }
-	
 	public SiMonUser getSimonUserInfo() throws XmlRpcFault {
 	    XmlRpcStruct r = simon.getSiMonUserInfo(this.username, this.password);
 	    SiMonUser result = new SiMonUser();
@@ -156,13 +83,13 @@ interface SiMon {
 	XmlRpcArray getProjects(String username, String password)
 			throws XmlRpcFault;
 	
-	XmlRpcArray getLocations(String username, String password, long projectCloudID, long searchFrom)
+	XmlRpcArray getLocations(String username, String password, long projectCloudID)
 			throws XmlRpcFault;
 	
 	int uploadProject(String username, String password, 
 			long cloudID, String projectName, String projectNumber) throws XmlRpcFault;
 	
-	int deleteProject(String username, String password, 
+	int projectLimit(String username, String password, 
 			long cloudID)  throws XmlRpcFault;
 	
 	int uploadLocation(String username, String password, 
@@ -177,12 +104,6 @@ interface SiMon {
 			long cloudID, long projectID, long reportID, long locationID,
 			String activityOrItem, float progress, String description,
 			String onTime) throws XmlRpcFault;
-	
-	XmlRpcStruct uploadPhoto(String username, String password, long cloudID, long reportItemCloudID, 
-			long projectCloudID, long locationCloudID) throws XmlRpcFault;
-	
-	String uploadPhotoFile(String username, String password,
-		      XmlRpcStruct data, long cloudID) throws XmlRpcFault;
 	
 	XmlRpcStruct getSiMonUserInfo(String username, String password)
 		      throws XmlRpcFault;

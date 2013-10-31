@@ -11,7 +11,6 @@ import uk.co.simon.app.sqllite.DataSourceReports;
 import uk.co.simon.app.sqllite.SQLReport;
 import uk.co.simon.app.sqllite.SQLReportItem;
 import uk.co.simon.app.ui.customElements.ExpandableHeightListView;
-import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
@@ -24,6 +23,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import com.bugsense.trace.BugSenseHandler;
 
 public class ActivityReport extends FragmentActivity implements uk.co.simon.app.DialogFragmentReportItem.onDialogResultListener, 
 	uk.co.simon.app.FragmentProgressReportHeader.onSpinnerSelect, uk.co.simon.app.DialogFragmentProjectEntry.onDialogResultListener {
@@ -40,8 +41,8 @@ public class ActivityReport extends FragmentActivity implements uk.co.simon.app.
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        
+
+		BugSenseHandler.initAndStartSession(ActivityReport.this, "6c6b0664");        
         setContentView(R.layout.activity_report);
         
         reportsDatasource = new DataSourceReports(this);
