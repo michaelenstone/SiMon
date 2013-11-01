@@ -31,6 +31,7 @@ public class SiMonWordpress extends Wordpress {
 	
 	@SuppressWarnings("unchecked")
 	public List<WPProject> getProjects() throws XmlRpcFault {
+
 		XmlRpcArray r = this.simon.getProjects(super.username, super.password);
 		return super.fillFromXmlRpcArray(r, WPProject.class);
 	}

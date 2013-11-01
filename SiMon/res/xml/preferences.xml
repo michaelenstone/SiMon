@@ -19,8 +19,8 @@
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="SyncPref"
-            android:summary="@string/preferencesApplicationSync"
-            android:title="@string/preferencesApplicationSyncSummary" />
+            android:summary="@string/preferencesApplicationSyncSummary"
+            android:title="@string/preferencesApplicationSync" />
     </PreferenceCategory>
 
 </PreferenceScreen>

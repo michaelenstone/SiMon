@@ -3,8 +3,6 @@ package uk.co.simon.app;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.bugsense.trace.BugSenseHandler;
-
 import uk.co.simon.app.adapters.AdapterProjects;
 import uk.co.simon.app.sqllite.DataSourceProjects;
 import uk.co.simon.app.sqllite.DataSourceReports;
@@ -25,6 +23,8 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import com.bugsense.trace.BugSenseHandler;
 
 public class ActivityProjects extends FragmentActivity implements uk.co.simon.app.DialogFragmentProjectEntry.onDialogResultListener {
 	

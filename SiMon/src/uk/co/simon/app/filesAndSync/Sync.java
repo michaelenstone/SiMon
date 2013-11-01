@@ -42,7 +42,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.widget.Toast;
 
 public class Sync {
 
@@ -75,6 +74,7 @@ public class Sync {
 			DataSourceProjects datasource = new DataSourceProjects(context);
 			datasource.open();
 			List<SQLProject> projects = datasource.getAllProjects();
+			Boolean returnState = true;
 			try {
 				List<WPProject> WPProjects = wp.getProjects();
 				List<SQLProject> projectsNotOnServer = new ArrayList<SQLProject>();
@@ -83,7 +83,7 @@ public class Sync {
 				for (WPProject project : WPProjects) {
 					SQLProject sqlProject = datasource.getProjectFromCloudId(project.getCloudID());
 					if (sqlProject == null) {
-						projectsNotOnDevice.add(sqlProject);
+						projectsNotOnDevice.add(project.toSQLProject());
 					} else {
 						projectsNotOnServer.remove(sqlProject);
 					}
@@ -95,9 +95,11 @@ public class Sync {
 						counter++;
 					} else {
 						wp.projectLimit(project);
-						Toast toast = Toast.makeText(context, context.getString(R.string.errProjectDeviceLimit) 
-								+ project.getProject(), Toast.LENGTH_SHORT);
-						toast.show();
+						SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+						SharedPreferences.Editor editor = sharedPref.edit();
+						editor.putString("ErrorPref", context.getString(R.string.errProjectDeviceLimit) );
+						editor.commit();
+						returnState = false;
 					}
 				}
 				for (SQLProject project : projectsNotOnServer) {
@@ -105,10 +107,11 @@ public class Sync {
 					if (project.getCloudID()>-1) {
 						datasource.updateProject(project);
 					} else {
-						Toast toast = Toast.makeText(context, context.getString(R.string.errProjectServerLimit) 
-								+ project.getProject(), Toast.LENGTH_SHORT);
-						toast.show();
-						return true;
+						SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+						SharedPreferences.Editor editor = sharedPref.edit();
+						editor.putString("ErrorPref", context.getString(R.string.errProjectServerLimit) );
+						editor.commit();
+						returnState = false;
 					}
 				}
 			} catch (XmlRpcFault e) {
@@ -122,14 +125,73 @@ public class Sync {
 					return false;
 				}
 				e.printStackTrace();
+			} catch (Exception e) {
+				e.printStackTrace();
+				SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+				SharedPreferences.Editor editor = sharedPref.edit();
+				editor.putString("ErrorPref", context.getString(R.string.msgSyncFail) );
+				editor.commit();
+				return false;
 			}
 			List<SQLProject> syncedProjects = datasource.getAllProjects();
 			for (SQLProject project : syncedProjects) {
 				locationSync(project);
 			}
 			datasource.close();
-			return true;
+			return returnState;
 		} else {
+			SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+			SharedPreferences.Editor editor = sharedPref.edit();
+			editor.putString("ErrorPref", context.getString(R.string.msgSyncFail) );
+			editor.commit();
+			return false;
+		}
+	}
+
+	public boolean singleProjectSync(long projectID) {
+
+		if(networkIsAvailable()) {
+			DataSourceProjects datasource = new DataSourceProjects(context);
+			datasource.open();
+			SQLProject project = datasource.getProject(projectID);
+			Boolean returnState = true;
+			try {
+				project.setCloudID(wp.uploadProject(project));
+				if (project.getCloudID()>-1) {
+					datasource.updateProject(project);
+				} else {
+					SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+					SharedPreferences.Editor editor = sharedPref.edit();
+					editor.putString("ErrorPref", context.getString(R.string.errProjectServerLimit) );
+					editor.commit();
+					returnState = false;
+				}
+			} catch (XmlRpcFault e) {
+				if (e.getMessage().contains("invalid") && e.getMessage().contains("password")) {
+					SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+					SharedPreferences.Editor editor = sharedPref.edit();
+					editor.putString("PasswordPref", null);
+					editor.commit();
+					Intent login = new Intent(context, ActivityLogin.class);
+					context.startActivity(login);
+					return false;
+				}
+				e.printStackTrace();
+			} catch (Exception e) {
+				e.printStackTrace();
+				SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+				SharedPreferences.Editor editor = sharedPref.edit();
+				editor.putString("ErrorPref", context.getString(R.string.msgUploadFail) );
+				editor.commit();
+				return false;
+			}
+			datasource.close();
+			return returnState;
+		} else {
+			SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+			SharedPreferences.Editor editor = sharedPref.edit();
+			editor.putString("ErrorPref", context.getString(R.string.msgUploadFail) );
+			editor.commit();
 			return false;
 		}
 	}
@@ -231,7 +293,7 @@ public class Sync {
 					datasourceLocations.close();
 					reportItem.setCloudID(wp.uploadReportItem(reportItem, project.getCloudID(), report.getCloudID(), location.getCloudID()));
 					datasourceReportItems.updateReportItem(reportItem);
-					uploadPhotos(reportItem, project.getCloudID(), location.getCloudID());
+					if (!uploadPhotos(reportItem, project.getCloudID(), location.getCloudID())) return false;
 				} catch (XmlRpcFault e) {
 					if (e.getMessage().contains("invalid") && e.getMessage().contains("password")) {
 						SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
@@ -259,38 +321,47 @@ public class Sync {
 			datasource.open();
 			List<SQLPhoto> photos = datasource.getReportItemPhotos(reportItem.getId());
 			for (SQLPhoto photo : photos) {
-				HttpClient httpclient = new DefaultHttpClient();
-				HttpPost httppost = new HttpPost(
-						"http://www.simon-app.com/wp-content/plugins/SiMon%20Plugin/Upload.php?photo=set");
+				File file = new File(photo.getPhotoPath());
 
-				try {
-					MultipartEntity entity = new MultipartEntity();
+				if(file.exists()){ 
+					HttpClient httpclient = new DefaultHttpClient();
+					HttpPost httppost = new HttpPost(
+							"http://www.simon-app.com/wp-content/plugins/SiMon%20Plugin/Upload.php?photo=set");
 
-					entity.addPart("report_item_id", new StringBody(String.valueOf(reportItem.getCloudID())));
-					entity.addPart("project_id", new StringBody(String.valueOf(projectCloudID)));
-					entity.addPart("location_id", new StringBody(String.valueOf(locationCloudID)));
-					entity.addPart("user_id", new StringBody(String.valueOf(userID)));
+					try {
+						MultipartEntity entity = new MultipartEntity();
 
+						entity.addPart("report_item_id", new StringBody(String.valueOf(reportItem.getCloudID())));
+						entity.addPart("project_id", new StringBody(String.valueOf(projectCloudID)));
+						entity.addPart("location_id", new StringBody(String.valueOf(locationCloudID)));
+						entity.addPart("user_id", new StringBody(String.valueOf(userID)));
 
-					File file = new File(photo.getPhotoPath());
-					entity.addPart("image", new FileBody(file,"image/jpeg"));
+						entity.addPart("image", new FileBody(file,"image/jpeg"));
 
-					httppost.setEntity(entity);
-					HttpResponse response = httpclient.execute(httppost);
+						httppost.setEntity(entity);
+						HttpResponse response = httpclient.execute(httppost);
 
-					HttpEntity resEntity = response.getEntity();
+						HttpEntity resEntity = response.getEntity();
 
-					BufferedReader reader = new BufferedReader(new InputStreamReader(
-							resEntity.getContent(), "UTF-8"));
-					String sResponse;
-					StringBuilder s = new StringBuilder();
+						BufferedReader reader = new BufferedReader(new InputStreamReader(
+								resEntity.getContent(), "UTF-8"));
+						String sResponse;
+						StringBuilder s = new StringBuilder();
 
-					while ((sResponse = reader.readLine()) != null) {
-						s = s.append(sResponse);
+						while ((sResponse = reader.readLine()) != null) {
+							s = s.append(sResponse);
+						}
+						if (s.toString().contains("Profile Limit Reached")) {
+							SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+							SharedPreferences.Editor editor = sharedPref.edit();
+							editor.putString("ErrorPref", context.getString(R.string.errPhotoStorageLimit) );
+							editor.commit();
+							return false;
+						}
+						Log.w("test", "Response: " + s);
+					} catch (ClientProtocolException e) {
+					} catch (IOException e) {
 					}
-					Log.w("test", "Response: " + s);
-				} catch (ClientProtocolException e) {
-				} catch (IOException e) {
 				}
 			}
 			datasource.close();

@@ -1,9 +1,9 @@
 package uk.co.simon.app;
 
-import com.bugsense.trace.BugSenseHandler;
-
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
+
+import com.bugsense.trace.BugSenseHandler;
 
 public class ActivitySettings extends PreferenceActivity {
     @SuppressWarnings("deprecation")

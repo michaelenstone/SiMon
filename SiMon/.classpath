@@ -7,7 +7,7 @@
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
 	<classpathentry exported="true" kind="lib" path="libs/httpmime-4.2.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/droidText.0.4.jar"/>
-	<classpathentry kind="lib" path="libs/xmlrpc-1.1.1.jar" sourcepath="C:/Users/Michael Enstone/Downloads/redstone-xmlrpc-src-1.1.1"/>
 	<classpathentry kind="lib" path="libs/bugsense-3.5.jar"/>
+	<classpathentry kind="lib" path="libs/openbeans-1.0.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

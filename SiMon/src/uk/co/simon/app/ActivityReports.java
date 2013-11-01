@@ -4,8 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.bugsense.trace.BugSenseHandler;
-
 import uk.co.simon.app.adapters.AdapterReports;
 import uk.co.simon.app.filesAndSync.PDFCreator;
 import uk.co.simon.app.filesAndSync.UploadReport;
@@ -26,6 +24,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import com.bugsense.trace.BugSenseHandler;
 
 public class ActivityReports extends FragmentActivity {
 	

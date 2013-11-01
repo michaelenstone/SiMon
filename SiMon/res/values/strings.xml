@@ -14,8 +14,8 @@
     <string name="preferencesEmailSummary">Enter the Email you use as a username for SiMon online</string>
     <string name="preferencesPassword">Password</string>
     <string name="preferencesPasswordSummary">Enter the Password you use to login to SiMon online</string>
-    <string name="preferencesApplicationSync">Automatically sync Projects and Locations</string>
-    <string name="preferencesApplicationSyncSummary">Select this option to automatically sync yourprojects and locations on start - This option may incur additional data costs</string>
+    <string name="preferencesApplicationSync">Auto-sync Projects &amp; Locations</string>
+    <string name="preferencesApplicationSyncSummary">Select this option to automatically sync projects and locations on start - THIS OPTION MAY INCUR ADDITIONAL DATA USAGE COSTS</string>
       
     <!-- Strings for Alert Dialogs -->
     <string name="alert_dialog_ok">OK</string>
@@ -139,9 +139,13 @@
     
     <!--  Error Messages -->
     <string name="errProjectServerLimit">Too many projects to sync: delete a project on device or web</string>
-    <string name="errProjectDeviceLimit">Too many projects to sync: the following project has been removed from the server - </string>
+    <string name="errProjectDeviceLimit">Too many projects to sync: delete a project on device or web</string>
+    <string name="errPhotoStorageLimit">Photo Storage Limit has been reached please remove some images</string>
     
     <!--  Messages -->
     <string name="msgSyncSuccess">Sync Successful</string>
+    <string name="msgSyncFail">Sync Failed</string>
+    <string name="msgUploadSuccess">Upload Successful</string>
+    <string name="msgUploadFail">Upload Failed</string>
 
 </resources>

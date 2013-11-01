@@ -1,6 +1,6 @@
 package uk.co.simon.app;
 
-import uk.co.simon.app.filesAndSync.xmlrpcCheckTask;
+import uk.co.simon.app.filesAndSync.ProjectLocationAsync;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -27,7 +27,7 @@ public class ActivityHome extends Activity {
 		context = this;
 		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
 		if (sharedPref.getBoolean("SyncPref", false)) {
-			xmlrpcCheckTask mTask = new xmlrpcCheckTask(context, this);
+			ProjectLocationAsync mTask = new ProjectLocationAsync(context, this);
 			mTask.execute((Void) null);
 		}
 	}

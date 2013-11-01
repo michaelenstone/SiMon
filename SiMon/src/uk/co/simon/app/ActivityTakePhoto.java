@@ -9,8 +9,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Timer;
 
-import com.bugsense.trace.BugSenseHandler;
-
 import uk.co.simon.app.filesAndSync.FileManager;
 import uk.co.simon.app.sensors.mySensorEventListener;
 import uk.co.simon.app.sqllite.DataSourcePhotos;
@@ -38,6 +36,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+
+import com.bugsense.trace.BugSenseHandler;
 
 public class ActivityTakePhoto extends Activity implements SurfaceHolder.Callback {
 

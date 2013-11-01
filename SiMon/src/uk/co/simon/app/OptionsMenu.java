@@ -1,6 +1,6 @@
 package uk.co.simon.app;
 
-import uk.co.simon.app.filesAndSync.xmlrpcCheckTask;
+import uk.co.simon.app.filesAndSync.ProjectLocationAsync;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -33,7 +33,7 @@ public class OptionsMenu {
 			activity.startActivity(openSettings);
 			return true;
 		case R.id.menuSync:
-			xmlrpcCheckTask mTask = new xmlrpcCheckTask(context, activity);
+			ProjectLocationAsync mTask = new ProjectLocationAsync(context, activity);
 			mTask.execute((Void) null);
 			return true;
 		case R.id.menuLogout:
