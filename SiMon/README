@@ -9,9 +9,10 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
-This work has been licensed under two licenses covering the packages contained within:
+This work has been licensed under a number of licenses covering the packages contained within:
 
 net.bican.wordpress is from Can Bican and is covered by the Creative Commons 3.0 BY-SA license
 uk.co.simon.app.wordpress is derived from this and is also covered by Creative Commons 3.0 BY-SA
+iText is licensed under Affero General Public License (AGPL) as is uk.co.simon.app.filesAndSync.PDFCreator.java
 all other packages are licensed under GNU General Public License, version 2 (GPL-2.0)
 
