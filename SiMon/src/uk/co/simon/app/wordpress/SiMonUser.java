@@ -5,11 +5,7 @@ import net.bican.wordpress.XmlRpcMapped;
 
 public class SiMonUser extends XmlRpcMapped  implements StringHeader {
 
-	public String projectLimit;
-	public String manyUsers;
-	public String primaryAccountId;
 	public String photoStorage;
-	public String accessReports;
 	public String nickname;
 	public Integer userid;
 	public String url;
@@ -23,44 +19,19 @@ public class SiMonUser extends XmlRpcMapped  implements StringHeader {
 		+ TAB + "Photo Storage" + TAB + "Can Access Reports";
 	}
 
-	public int getMaxProjects() {
-		return Integer.parseInt(projectLimit);
-	}
-
-	public void setMaxProjects(String maxProjects) {
-		this.projectLimit = maxProjects;
-	}
-
-	public boolean isManyUsers() {
-		return Boolean.getBoolean(manyUsers);
-	}
-
-	public void setManyUsers(String manyUsers) {
-		this.manyUsers = manyUsers;
-	}
-
-	public int getPrimaryAccountId() {
-		return Integer.parseInt(primaryAccountId);
-	}
-
-	public void setPrimaryAccountId(String primaryAccountId) {
-		this.primaryAccountId = primaryAccountId;
-	}
-
+	
 	public int getPhotoStorage() {
-		return Integer.parseInt(photoStorage);
+		int output = 0;
+		try {
+			output = Integer.parseInt(photoStorage);
+		} catch (NumberFormatException nfe) {
+			output = 0;
+		}
+		return output;
 	}
 
 	public void setPhotoStorage(String photoStorage) {
 		this.photoStorage = photoStorage;
-	}
-
-	public boolean isAccessReports() {
-		return Boolean.getBoolean(accessReports);
-	}
-
-	public void setAccessReports(String accessReports) {
-		this.accessReports = accessReports;
 	}
 
 	/**

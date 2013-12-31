@@ -5,12 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import uk.co.simon.app.R;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 import android.widget.Toast;
 
 public class DataSourceReports {
@@ -93,13 +93,15 @@ public class DataSourceReports {
 		return updReport;
 	}
 
-	public void deleteReport(SQLReport report, boolean showToast) {
+	public void deleteReport(SQLReport report) {
+		DataSourceReportItems datasourceReportItems = new DataSourceReportItems(context);
+		datasourceReportItems.open();
+		datasourceReportItems.deleteReportItems(report);
+		datasourceReportItems.close();
 		database.delete(SQLiteHelper.REPORTS_TABLE_NAME, 
 				SQLiteHelper.COLUMN_ID + " = " + report.getId(), null);
-		if (showToast) {
-			Toast toast = Toast.makeText(context, "Report deleted with id: " + report.getId(), Toast.LENGTH_SHORT);
-			toast.show();
-		}
+		Toast toast = Toast.makeText(context, context.getString(R.string.msgReportDeleted) + report.getId(), Toast.LENGTH_SHORT);
+		toast.show();
 	}
 
 	public List<SQLReport> getAllReports() {
@@ -168,7 +170,6 @@ public class DataSourceReports {
 		Cursor cursor = database.query(SQLiteHelper.REPORTS_TABLE_NAME,
 				allColumns, SQLiteHelper.COLUMN_ID + " = " + reportId, null,
 				null, null, null);
-		Log.w("Cursor", cursor.toString());
 		cursor.moveToFirst();
 		SQLReport Report = cursorToReport(cursor);
 		cursor.close();

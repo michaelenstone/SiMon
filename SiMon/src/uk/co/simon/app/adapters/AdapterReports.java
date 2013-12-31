@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import uk.co.simon.app.sqllite.SQLReport;
-
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;

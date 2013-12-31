@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import uk.co.simon.app.R;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -94,7 +96,7 @@ public class DataSourcePhotos {
 		photoFile.delete();
 		database.delete(SQLiteHelper.PHOTOS_TABLE_NAME, 
 				SQLiteHelper.COLUMN_ID + " = " + photo.getId(), null);
-		Toast toast = Toast.makeText(context, "Photo deleted with id: " + photo.getId(), Toast.LENGTH_SHORT);
+		Toast toast = Toast.makeText(context, context.getString(R.string.msgPhotoDeleted) + photo.getId(), Toast.LENGTH_SHORT);
 		toast.show();
 	}
 

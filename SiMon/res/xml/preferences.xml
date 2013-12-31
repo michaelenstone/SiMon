@@ -15,12 +15,25 @@
             android:key="PasswordPref"
             android:summary="@string/preferencesPasswordSummary"
             android:title="@string/preferencesPassword" />
-
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="SyncPref"
             android:summary="@string/preferencesApplicationSyncSummary"
             android:title="@string/preferencesApplicationSync" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="autoFocusPref"
+            android:summary="@string/preferencesAutoFocusSummary"
+            android:title="@string/preferencesAutoFocus" />
+        <Preference
+            android:summary="@string/preferencesSelectLogoSummary"
+            android:title="@string/preferencesSelectLogo"
+            android:key="imagePicker" 
+    	/>
+        <EditTextPreference
+            android:key="ErrorPref"
+            android:summary="@string/preferencesPasswordSummary"
+            android:title="@string/preferencesPassword" />
     </PreferenceCategory>
 
 </PreferenceScreen>

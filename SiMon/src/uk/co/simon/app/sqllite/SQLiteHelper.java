@@ -3,7 +3,6 @@ package uk.co.simon.app.sqllite;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 public class SQLiteHelper extends SQLiteOpenHelper {
 
@@ -47,7 +46,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 	public static final String COLUMN_GPSZ = "gpsz";
 
 	private static final String DATABASE_NAME = "sitehelper.db";
-	private static final int DATABASE_VERSION = 12;
+	private static final int DATABASE_VERSION = 1;
 
 	private static final String PROJECTS_DATABASE_CREATE = "create table "
 			+ PROJECTS_TABLE_NAME + "(" + COLUMN_ID + " integer primary key autoincrement, "
@@ -118,9 +117,6 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		// TODO: Remember to put database upgrade code here!
-		Log.w(SQLiteHelper.class.getName(),
-				"Upgrading database from version " + oldVersion + " to "
-						+ newVersion + ", which will destroy all old data");
 		db.execSQL("DROP TABLE IF EXISTS " + PROJECTS_TABLE_NAME);
 		db.execSQL("DROP TABLE IF EXISTS " + LOCATIONS_TABLE_NAME);
 		db.execSQL("DROP TABLE IF EXISTS " + REPORTS_TABLE_NAME);

@@ -73,11 +73,18 @@ public class DataSourceProjects {
 		toast.show();
 	  }
 
+	  public void deleteAllProjects() {
+		  List<SQLProject> projects = getAllProjects();
+		  for (SQLProject project : projects) {
+			  deleteProject(project);
+		  }
+	  }
+	  
 	  public List<SQLProject> getAllProjects() {
 	    List<SQLProject> projects = new ArrayList<SQLProject>();
 
 	    Cursor cursor = database.query(SQLiteHelper.PROJECTS_TABLE_NAME,
-	        allColumns, null, null, null, null, null);
+	        allColumns, null, null, null, null, SQLiteHelper.COLUMN_PROJECT_NAME + " ASC");
 
 	    cursor.moveToFirst();
 	    while (!cursor.isAfterLast()) {

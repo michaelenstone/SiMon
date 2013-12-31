@@ -2,6 +2,8 @@ package uk.co.simon.app.filesAndSync;
 
 import java.io.File;
 
+import uk.co.simon.app.R;
+
 import android.content.Context;
 import android.os.Environment;
 import android.widget.Toast;
@@ -21,7 +23,7 @@ public class FileManager {
 				dir.mkdirs();
 			}
 		} catch (Exception e) {
-			Toast toast = Toast.makeText(context, "Error Creating Directory: " + e, Toast.LENGTH_LONG);
+			Toast toast = Toast.makeText(context, context.getString(R.string.errCreatingDirectory), Toast.LENGTH_LONG);
 			toast.show();
 		} 
 		return dir;
@@ -35,7 +37,7 @@ public class FileManager {
 				dir.mkdirs();
 			}
 		} catch (Exception e) {
-			Toast toast = Toast.makeText(context, "Error Creating Directory: " + e, Toast.LENGTH_LONG);
+			Toast toast = Toast.makeText(context, context.getString(R.string.errCreatingDirectory), Toast.LENGTH_LONG);
 			toast.show();
 		} 
 		return dir;

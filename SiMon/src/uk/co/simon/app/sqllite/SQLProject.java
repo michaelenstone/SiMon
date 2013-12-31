@@ -44,4 +44,13 @@ public class SQLProject {
 		this.cloudID = cloudID;
 	}
 
+	public boolean equals(SQLProject project) {
+		if (project.getProject() == this.Project && 
+				project.getProjectNumber() == this.ProjectNumber &&
+				project.getCloudID() == this.cloudID) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 }

@@ -3,6 +3,7 @@ package uk.co.simon.app;
 import java.net.MalformedURLException;
 
 import redstone.xmlrpc.XmlRpcFault;
+import uk.co.simon.app.filesAndSync.Sync;
 import uk.co.simon.app.wordpress.SiMonUser;
 import uk.co.simon.app.wordpress.SiMonWordpress;
 import android.animation.Animator;
@@ -18,7 +19,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.View;
@@ -234,19 +234,15 @@ public class ActivityLogin extends Activity {
 			}
 			try {
 				user = wp.getSimonUserInfo();
-			} catch (XmlRpcFault e) {
-				Log.w("login error", mPassword);
-				Log.w("login error", e);
+				Sync sync = new Sync(context);
+				sync.projectSync();
+				} catch (XmlRpcFault e) {
 				return false;
 			}
 			SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
 			SharedPreferences.Editor editor = sharedPref.edit();
 			editor.putInt("UserID", user.getUserid());
-			editor.putInt("ProjectLimit", user.getMaxProjects());
-			editor.putBoolean("ManyUsers", user.isManyUsers());
-			editor.putInt("PrimaryAccountId", user.getPrimaryAccountId());
 			editor.putInt("PhotoStorage", user.getPhotoStorage());
-			editor.putBoolean("AccessReports", user.isAccessReports());
 			editor.putString("NamePref", user.getFirstname() + " " + user.getLastname());
 			editor.commit();
 			return true;

@@ -4,8 +4,8 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
+import uk.co.simon.app.R;
 import uk.co.simon.app.sqllite.SQLPhoto;
-
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -61,7 +61,7 @@ public class AdapterImages extends BaseAdapter {
 		try {
 			bm = decodePath(list.get(position).getPhotoPath(), 150);
 		} catch (FileNotFoundException e) {
-			Toast toast = Toast.makeText(convertView.getContext(), "File not Found: " + e, Toast.LENGTH_LONG);
+			Toast toast = Toast.makeText(convertView.getContext(), mContext.getString(R.string.errFileNotFound), Toast.LENGTH_LONG);
 			toast.show();
 		}
         imageView.setImageBitmap(bm);

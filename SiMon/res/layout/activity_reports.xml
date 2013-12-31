@@ -23,15 +23,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="onClickReports"
-            android:text="@string/newProject" />
+            android:text="@string/newReport" />
         
-        <Button
+        <!--<Button
             android:id="@+id/filterReportsButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:onClick="onClickReports"
-            android:text="@string/filterReports" />
+            android:text="@string/filterReports" /> -->
 
     </LinearLayout>
 

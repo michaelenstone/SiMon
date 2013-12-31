@@ -1,7 +1,5 @@
 package uk.co.simon.app.filesAndSync;
 
-import harmony.java.awt.Color;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -21,28 +19,32 @@ import uk.co.simon.app.sqllite.SQLPhoto;
 import uk.co.simon.app.sqllite.SQLProject;
 import uk.co.simon.app.sqllite.SQLReport;
 import uk.co.simon.app.sqllite.SQLReportItem;
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.widget.Toast;
 
-import com.lowagie.text.Annotation;
-import com.lowagie.text.Chunk;
-import com.lowagie.text.Document;
-import com.lowagie.text.DocumentException;
-import com.lowagie.text.Element;
-import com.lowagie.text.Font;
-import com.lowagie.text.Image;
-import com.lowagie.text.Paragraph;
-import com.lowagie.text.Rectangle;
-import com.lowagie.text.pdf.PdfPCell;
-import com.lowagie.text.pdf.PdfPTable;
-import com.lowagie.text.pdf.PdfWriter;
+import com.bugsense.trace.BugSenseHandler;
+import com.itextpdf.text.Chunk;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.CMYKColor;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
 
 public class PDFCreator extends AsyncTask<Void, Void, String> {
-	
+
 	SQLReport thisReport;
 	Context context;
 	ProgressDialog progress;
@@ -66,7 +68,7 @@ public class PDFCreator extends AsyncTask<Void, Void, String> {
 		}
 		return null;
 	}
-	
+
 	protected void onPostExecute(String result) {
 		String message = new String();
 		if (result==null){			
@@ -75,9 +77,10 @@ public class PDFCreator extends AsyncTask<Void, Void, String> {
 			datasource.open();
 			datasource.updateReport(thisReport);
 			datasource.close();
-			message = "PDF Created";
+			message = context.getString(R.string.pdfSuccess);
 		} else {
-			message = "Could not create PDF - Error: " + result;
+			message = context.getString(R.string.pdfFailure);
+			BugSenseHandler.sendEvent(result);
 		}
 		Toast toast = Toast.makeText(context, message, Toast.LENGTH_LONG);
 		try {
@@ -87,25 +90,85 @@ public class PDFCreator extends AsyncTask<Void, Void, String> {
 		toast.show();
 	}
 
-	
 	public String createPDF() throws DocumentException, IOException {
 
 		DataSourceProjects datasource = new DataSourceProjects(context);
 		DataSourceReportItems datasourceReportItems = new DataSourceReportItems(context);
 		DataSourcePhotos datasourcePhotos = new DataSourcePhotos(context);
 		DataSourceLocations datasourceLocations = new DataSourceLocations(context);
-		
-		Font titleFont = new Font();
-		titleFont.setStyle(Font.TIMES_ROMAN);
-		titleFont.setSize(25);
-		
+		float heightUsed = 0f;
+		float leftRightMargins = 0f;
+		float topMargin = 60f;
+		float bottomMargin = 60f;
+
+		//Set Fonts
+		Font titleFont = new Font(Font.FontFamily.HELVETICA, 16, Font.BOLD);
+		Font subtitleFont = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD);
+		Font paragraphFont = new Font(Font.FontFamily.HELVETICA, 10, Font.NORMAL);
+		Font behindFont = new Font(Font.FontFamily.HELVETICA, 10, Font.NORMAL, CMYKColor.WHITE);
+
 		Document doc = new Document();
 		String pdfPath = getOutputFile(thisReport, context);
 		OutputStream pdfFile = new FileOutputStream(pdfPath);
 		PdfWriter.getInstance(doc, pdfFile);
+		doc.setMargins(leftRightMargins, leftRightMargins, topMargin, bottomMargin);
 		doc.open();
+		float pageHeight = doc.getPageSize().getHeight();
+		float pageWidth = doc.getPageSize().getWidth();
+		pageHeight = pageHeight - bottomMargin;
 
-		PdfPTable title = new PdfPTable(1);
+		PdfPTable title = new PdfPTable(2);
+		float[] titleColumnWidths = {30f, 70f};
+		title.setWidths(titleColumnWidths);
+		title.setTotalWidth(pageWidth);
+		title.setSpacingBefore(0);
+		title.setSpacingAfter(15);
+
+		PdfPCell titleImageCell = new PdfPCell();
+
+		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+		String customLogoPath = sharedPref.getString("imagePicker", null);
+		boolean useDefaultLogo = true;
+		
+		if (customLogoPath != null ) {
+			File customLogo = new File(customLogoPath);
+			if (customLogo.exists()) {
+				useDefaultLogo = false;
+			}
+		}
+		
+		if (useDefaultLogo) {
+			Bitmap logoImageResource = BitmapFactory.decodeResource(context.getResources(), R.drawable.logo_white_bg);
+			ByteArrayOutputStream logoStream = new ByteArrayOutputStream();
+			logoImageResource.compress(Bitmap.CompressFormat.JPEG, 80, logoStream);
+			Image logo = Image.getInstance(logoStream.toByteArray());
+			logo.setCompressionLevel(9);
+			logo.scaleToFit(100, 220);
+			titleImageCell.addElement(logo);
+			titleImageCell.setHorizontalAlignment(Element.ALIGN_BOTTOM);
+			titleImageCell.setBorder(Rectangle.NO_BORDER);
+			titleImageCell.setPaddingTop(5);
+			title.addCell(titleImageCell);
+			logoImageResource.recycle();
+		} else {
+			final BitmapFactory.Options logoOptions = new BitmapFactory.Options();
+			logoOptions.inJustDecodeBounds = false;
+			Bitmap rawImage = BitmapFactory.decodeFile(customLogoPath, logoOptions);
+			float scale = Math.min(416f/((float) rawImage.getWidth()), 1);
+			Bitmap scaledBitmap = Bitmap.createScaledBitmap(rawImage, (int)Math.ceil(rawImage.getWidth()*scale), (int)Math.ceil(rawImage.getHeight()*scale), true);
+			ByteArrayOutputStream logoStream = new ByteArrayOutputStream();
+			scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 80, logoStream);
+			Image logo = Image.getInstance(logoStream.toByteArray());
+			logo.setCompressionLevel(9);
+			logo.scaleToFit(100, 220);
+			titleImageCell.addElement(logo);
+			titleImageCell.setHorizontalAlignment(Element.ALIGN_BOTTOM);
+			titleImageCell.setBorder(Rectangle.NO_BORDER);
+			titleImageCell.setPaddingTop(5);
+			title.addCell(titleImageCell);			
+			rawImage.recycle();
+			scaledBitmap.recycle();
+		}
 		
 		PdfPCell titleCell = new PdfPCell();
 		Paragraph titlePara = new Paragraph();
@@ -114,180 +177,249 @@ public class PDFCreator extends AsyncTask<Void, Void, String> {
 		} else {
 			titlePara.add(context.getResources().getString(R.string.pdfProgressReportTitle));
 		}
+		titlePara.add(" - ");
+		titlePara.add(thisReport.getReportDate());
 		titlePara.setSpacingAfter(5);
 		titlePara.setFont(titleFont);
+		titlePara.setAlignment(Element.ALIGN_RIGHT);
 		titleCell.addElement(titlePara);
-		titleCell.setBorder(Rectangle.BOTTOM);
+
+		datasource.open();
+		SQLProject project = datasource.getProject(thisReport.getProjectId());
+		datasource.close();
+		Paragraph projectPara = new Paragraph();
+		projectPara.add(project.getProject());
+		projectPara.setAlignment(Element.ALIGN_RIGHT);
+		projectPara.setFont(paragraphFont);
+		projectPara.setSpacingAfter(3);
+		titleCell.addElement(projectPara);
+
+		Paragraph authorPara = new Paragraph();
+		authorPara.add(thisReport.getSupervisor());
+		authorPara.setAlignment(Element.ALIGN_RIGHT);
+		authorPara.setFont(paragraphFont);
+		titleCell.addElement(authorPara);
+
+		titleCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+		titleCell.setVerticalAlignment(Element.ALIGN_BOTTOM);
+		titleCell.setBorder(Rectangle.NO_BORDER);
+
 		title.addCell(titleCell);
-		title.setSpacingAfter(25);
 		doc.add(title);
-		
-		PdfPTable header = new PdfPTable(4);
+		heightUsed = title.getTotalHeight();
 
-        header.addCell(new PdfPCell(new Paragraph(context.getResources().getString(R.string.dailyProgressProject))));
-        datasource.open();
-        SQLProject project = datasource.getProject(thisReport.getProjectId());
-        header.addCell(new PdfPCell(new Paragraph(project.toString())));
-        datasource.close();
-        header.addCell(new PdfPCell(new Paragraph(context.getResources().getString(R.string.dailyProgressDate))));
-        header.addCell(new PdfPCell(new Paragraph(thisReport.getReportDate())));
-        
-        header.addCell(new PdfPCell(new Paragraph(context.getResources().getString(R.string.dailyProgressSupervisor))));
-        header.addCell(new PdfPCell(new Paragraph(thisReport.getSupervisor())));
-        header.addCell(new PdfPCell(new Paragraph(context.getResources().getString(R.string.dailyProgressReportRef))));
-        header.addCell(new PdfPCell(new Paragraph(thisReport.getReportRef())));
+		Paragraph reportRefPara = new Paragraph();
+		reportRefPara.add(new Chunk(context.getResources().getString(R.string.dailyProgressReportRef) + 
+				": " + thisReport.getReportRef(), subtitleFont));
+		reportRefPara.setAlignment(Element.ALIGN_LEFT);
+		reportRefPara.setSpacingAfter(10);
+		reportRefPara.setFont(subtitleFont);
+		reportRefPara.setIndentationLeft(60f);
+		doc.add(reportRefPara);
 
-        header.addCell(new PdfPCell(new Paragraph(context.getResources().getString(R.string.dailyProgressWeather))));
-        header.addCell(new PdfPCell(new Paragraph(thisReport.getWeather())));
-        header.addCell(new PdfPCell(new Paragraph(context.getResources().getString(R.string.dailyProgressTemp))));
-        String[] tempType = context.getResources().getStringArray(R.array.dailyProgressTempType);
-        header.addCell(new PdfPCell(new Paragraph(thisReport.getTemp() + " " + tempType[(int) thisReport.getTempType()])));
-        
-        header.setSpacingAfter(25);
-        
-        doc.add(header);
+		heightUsed = heightUsed + 20f;
 
-		PdfPTable contents = new PdfPTable(2);
-		
-		float[] columnWidths = {10f, 90f};
-		contents.setWidths(columnWidths);
-		
-		contents.addCell(new PdfPCell(new Paragraph(context.getResources().getString(R.string.pdfNoColumn))));
-		contents.addCell(new PdfPCell(new Paragraph(context.getResources().getString(R.string.pdfItemColumn))));
-        
 		datasourceReportItems.open();
 		datasourceLocations.open();			
 		datasourcePhotos.open();
-		
+
 		java.util.List<SQLReportItem> reportItems = datasourceReportItems.getReportItems(thisReport.getId());
-		
+
 		int i = 1;
-		
+
 		for (SQLReportItem reportItem : reportItems) {
-			//Row 1
-			PdfPCell row1Cell1 = new PdfPCell();
-			row1Cell1.addElement(new Paragraph(Integer.toString(i)));
-			row1Cell1.setBorder(Rectangle.RIGHT);
-			contents.addCell(row1Cell1);
-			
-			PdfPCell row1Cell2 = new PdfPCell();
-			SQLLocation location = datasourceLocations.getLocation(reportItem.getLocationId());
-			row1Cell2.addElement(new Paragraph(
-					context.getResources().getString(R.string.dailyProgressLocation) +
-					": " + 
-					location.getLocation()));
-			row1Cell2.setBorder(Rectangle.LEFT);
-			contents.addCell(row1Cell2);
-			
-			//Row 2
-			PdfPCell row2Cell1 = new PdfPCell();
-			row2Cell1.addElement(new Paragraph(" "));
-			row2Cell1.setBorder(Rectangle.RIGHT);
-			contents.addCell(row2Cell1);
-			
-			PdfPCell row2Cell2 = new PdfPCell();
-			row2Cell2.addElement(new Paragraph(
-					context.getResources().getString(R.string.dailyProgressActivity) +
-					": " + 
-					reportItem.getReportItem()));
-			row2Cell2.setBorder(Rectangle.LEFT);
-			contents.addCell(row2Cell2);
-			
+
+			PdfPTable reportItemTable = new PdfPTable(3);
+
+			float[] columnWidths = {10f, 30f, 60f};
+			reportItemTable.setWidths(columnWidths);
+			reportItemTable.setTotalWidth(pageWidth);
+
+			//Header Row
+			PdfPCell headerRowCellLeft = new PdfPCell();
+			PdfPCell headerRowCellRight = new PdfPCell();
+
+			Paragraph itemNoPara = new Paragraph();
+			Paragraph itemStatusPara = new Paragraph();
+
+			String[] onTimeArray = context.getResources().getStringArray(R.array.dailyProgressOnTimeSpinner);
+			if (reportItem.getOnTIme().contains(onTimeArray[0]) && !thisReport.getReportType()) {
+				headerRowCellLeft.setBackgroundColor(new CMYKColor(17,0,52,27));
+				headerRowCellLeft.setBorderColor(new CMYKColor(17,0,52,27));
+				headerRowCellRight.setBackgroundColor(new CMYKColor(17,0,52,27));
+				headerRowCellRight.setBorderColor(new CMYKColor(17,0,52,27));
+				itemNoPara.setFont(paragraphFont);
+				itemStatusPara.setFont(paragraphFont);
+			} else if (reportItem.getOnTIme().contains(onTimeArray[2]) && !thisReport.getReportType()) {
+				headerRowCellLeft.setBackgroundColor(new CMYKColor(0,100,100,39));
+				headerRowCellLeft.setBorderColor(new CMYKColor(0,100,100,39));
+				headerRowCellRight.setBackgroundColor(new CMYKColor(0,100,100,39));
+				headerRowCellRight.setBorderColor(new CMYKColor(0,100,100,39));
+				itemNoPara.setFont(behindFont);
+				itemStatusPara.setFont(behindFont);
+			} else {
+				headerRowCellLeft.setBackgroundColor(new CMYKColor(0,20,100,0));
+				headerRowCellLeft.setBorderColor(new CMYKColor(0,20,100,0));
+				headerRowCellRight.setBackgroundColor(new CMYKColor(0,20,100,0));
+				headerRowCellRight.setBorderColor(new CMYKColor(0,20,100,0));
+				itemNoPara.setFont(paragraphFont);
+				itemStatusPara.setFont(paragraphFont);
+			}	
+
+			itemNoPara.add(context.getResources().getString(R.string.pdfItem) + ": " + i);
+			headerRowCellLeft.addElement(itemNoPara);
+			headerRowCellLeft.setColspan(2);
+			reportItemTable.addCell(headerRowCellLeft);
+
 			if (!thisReport.getReportType()) {
-				//Row 3
-				PdfPCell row3Cell1 = new PdfPCell();
-				row3Cell1.addElement(new Paragraph(" "));
-				row3Cell1.setBorder(Rectangle.RIGHT);
-				contents.addCell(row3Cell1);
-
-				PdfPCell row3Cell2 = new PdfPCell();
-				String[] onTimeArray = context.getResources().getStringArray(R.array.dailyProgressOnTimeSpinner);
-				Chunk progress = new Chunk(context.getResources().getString(R.string.pdfProgress) +	": " + 
-						reportItem.getProgress() + "% - ");
-				Chunk onTime = new Chunk(reportItem.getOnTIme());
-				if (reportItem.getOnTIme().contains(onTimeArray[0])) {
-					onTime.setBackground(Color.GREEN);
-				} else if (reportItem.getOnTIme().contains(onTimeArray[1])) {
-					onTime.setBackground(Color.ORANGE);
-				} else if (reportItem.getOnTIme().contains(onTimeArray[2])) {
-					onTime.setBackground(Color.RED);
-				}
-
-				Paragraph progressPara = new Paragraph();
-				progressPara.add(progress);
-				progressPara.add(onTime);
-				row3Cell2.addElement(progressPara);
-				row3Cell2.setBorder(Rectangle.LEFT);
-				contents.addCell(row3Cell2);
+				itemStatusPara.add(context.getResources().getString(R.string.pdfProgress) +	": " + 
+						reportItem.getProgress() + "% - " + reportItem.getOnTIme());
+				itemStatusPara.setAlignment(Element.ALIGN_RIGHT);
 			}
-			
-			//Row 4
-			PdfPCell row4Cell1 = new PdfPCell();
-			row4Cell1.addElement(new Paragraph(" "));
-			row4Cell1.setBorder(Rectangle.RIGHT);
-			contents.addCell(row4Cell1);
-			
-			PdfPCell row4Cell2 = new PdfPCell();
-			row4Cell2.addElement(new Paragraph(
-					context.getResources().getString(R.string.dailyProgressDescription) +
-					": " + 
-					reportItem.getDescription()));
-			row4Cell2.setBorder(Rectangle.LEFT);
-			contents.addCell(row4Cell2);
+
+			headerRowCellRight.addElement(itemStatusPara);
+			reportItemTable.addCell(headerRowCellRight);
+
+			//Row 2
+
+			PdfPCell locationTitleCell = new PdfPCell();
+			Paragraph locationTitle = new Paragraph();
+			locationTitle.add(context.getResources().getString(R.string.dailyProgressLocation));
+			locationTitle.setFont(paragraphFont);
+			locationTitleCell.addElement(locationTitle);
+			locationTitleCell.setBorderWidthTop(0);
+			reportItemTable.addCell(locationTitleCell);
+
+			PdfPCell locationCell = new PdfPCell();
+			Paragraph locationPara = new Paragraph();
+			SQLLocation location = datasourceLocations.getLocation(reportItem.getLocationId());
+			locationPara.add(location.getLocation());
+			locationPara.setFont(paragraphFont);
+			locationCell.addElement(locationPara);
+			locationCell.setBorderWidthTop(0);
+			reportItemTable.addCell(locationCell);
+
+			PdfPCell photosCell = new PdfPCell();
 
 			java.util.List<SQLPhoto> photos = datasourcePhotos.getReportItemPhotos(reportItem.getId());
-			PdfPCell rowPCell1 = new PdfPCell();
-			rowPCell1.addElement(new Paragraph(" "));
-			rowPCell1.setBorder(Rectangle.RIGHT);
-			contents.addCell(rowPCell1);
-			PdfPCell rowPCell2 = new PdfPCell();
-			
-			PdfPTable photoTable = new PdfPTable(2);
-			int x = 0;
-			for (SQLPhoto photo : photos) {
+			if (photos.size()>1) {
+				PdfPTable photoTable = new PdfPTable(2);
+				float[] photoColumnWidths = {50f, 50f};
+				photoTable.setWidths(photoColumnWidths);
+				photoTable.setTotalWidth(pageWidth*0.7f);
+				photoTable.getDefaultCell().setBorder(Rectangle.NO_BORDER);
+				photoTable.getDefaultCell().setPadding(5f);
+
+				int x = 0;
+				for (SQLPhoto photo : photos) {
+
+					File photoFile = new File(photo.getPhotoPath());
+					if (photoFile.exists()) {
+						final BitmapFactory.Options photoOptions = new BitmapFactory.Options();
+						photoOptions.inJustDecodeBounds = false;
+						Bitmap rawImage = BitmapFactory.decodeFile(photo.getPhotoPath(), photoOptions);
+						float scale = Math.min(520f/((float) rawImage.getWidth()), 1);
+						Bitmap scaledBitmap = Bitmap.createScaledBitmap(rawImage, (int)Math.ceil(rawImage.getWidth()*scale), (int)Math.ceil(rawImage.getHeight()*scale), true);
+						ByteArrayOutputStream photoStream = new ByteArrayOutputStream();
+						scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 75, photoStream);
+						Image photoImage = Image.getInstance(photoStream.toByteArray());
+						photoImage.setCompressionLevel(9);
+						photoTable.addCell(photoImage);
+						x++;
+						rawImage.recycle();
+						scaledBitmap.recycle();
+					}
+				}
+				if (x % 2 != 0) {
+					PdfPCell blankCell = new PdfPCell();
+					blankCell.addElement(new Paragraph(" "));
+					blankCell.setBorder(Rectangle.NO_BORDER);
+					photoTable.addCell(blankCell);
+				}
+				photosCell.addElement(photoTable);
 				
-				PdfPCell photoCell = new PdfPCell();
-		    	final BitmapFactory.Options options = new BitmapFactory.Options();
-		    	options.inJustDecodeBounds = false;
-		    	double scale = 1.4;
-		    	Bitmap rawImage = BitmapFactory.decodeFile(photo.getPhotoPath(), options);
-		    	Bitmap scaledBitmap = Bitmap.createScaledBitmap(rawImage, (int)Math.ceil(options.outWidth/scale), (int)Math.ceil(options.outHeight/scale), true);
-				ByteArrayOutputStream stream = new ByteArrayOutputStream();
-				scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 75, stream);
-				Image image = Image.getInstance(stream.toByteArray());
-				image.setCompressionLevel(9);
-				image.scaleToFit(250, 250);
-				String orientation = Float.toString(photo.getAzimuth()) + ":" + Float.toString(photo.getPitch()) + ":" + Float.toString(photo.getRoll());
-				String gpsPosition = Float.toString(photo.getGPSX()) + ":" + Float.toString(photo.getGPSY()) + ":" + Float.toString(photo.getGPSZ());
-				Annotation annotation = new Annotation(orientation, gpsPosition);
-				image.setAnnotation(annotation);
-				photoCell.addElement(new Chunk(image,0,0));
-				photoCell.setHorizontalAlignment(Element.ALIGN_CENTER);
-				photoCell.setBorder(Rectangle.NO_BORDER);
-				photoTable.addCell(photoCell);
-				x++;
-				rawImage.recycle();
-				scaledBitmap.recycle();
+			} else if (photos.size() == 1) {
+
+				PdfPTable photoTable = new PdfPTable(1);
+				float[] photoColumnWidths = {100f};
+				photoTable.setWidths(photoColumnWidths);
+				photoTable.setTotalWidth(pageWidth*0.7f);
+				photoTable.getDefaultCell().setBorder(Rectangle.NO_BORDER);
+				photoTable.getDefaultCell().setPadding(5f);
+
+				File photoFile = new File(photos.get(0).getPhotoPath());
+				if (photoFile.exists()) {
+					final BitmapFactory.Options photoOptions = new BitmapFactory.Options();
+					photoOptions.inJustDecodeBounds = false;
+					Bitmap rawImage = BitmapFactory.decodeFile(photos.get(0).getPhotoPath(), photoOptions);
+					float scale = Math.min(1040f/((float) rawImage.getWidth()), 1);
+					Bitmap scaledBitmap = Bitmap.createScaledBitmap(rawImage, (int)Math.ceil(rawImage.getWidth()*scale), (int)Math.ceil(rawImage.getHeight()*scale), true);
+					ByteArrayOutputStream photoStream = new ByteArrayOutputStream();
+					scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 75, photoStream);
+					Image photoImage = Image.getInstance(photoStream.toByteArray());
+					photoImage.setCompressionLevel(9);
+					photoTable.addCell(photoImage);
+					rawImage.recycle();
+					scaledBitmap.recycle();
+				}
+				photosCell.addElement(photoTable);
 			}
-			if (x % 2 != 0) {
-				PdfPCell blankCell = new PdfPCell();
-				blankCell.addElement(new Paragraph(" "));
-				blankCell.setBorder(Rectangle.NO_BORDER);
-				photoTable.addCell(blankCell);
-			}
-			rowPCell2.addElement(photoTable);
-			rowPCell2.setBorder(Rectangle.LEFT);
-			contents.addCell(rowPCell2);
+			photosCell.setBorderWidthTop(0);
+			photosCell.setRowspan(3);
+			reportItemTable.addCell(photosCell);
+
+			//Row 3
+
+			PdfPCell activityTitleCell = new PdfPCell();
+			Paragraph activityTitle = new Paragraph();
+			activityTitle.add(context.getResources().getString(R.string.dailyProgressActivity));
+			activityTitle.setFont(paragraphFont);
+			activityTitleCell.addElement(activityTitle);
+			activityTitleCell.setBorderWidthTop(0);
+			reportItemTable.addCell(activityTitleCell);
+
+			PdfPCell activityCell = new PdfPCell();
+			Paragraph activityPara = new Paragraph();
+			activityPara.add(reportItem.getReportItem());
+			activityPara.setFont(paragraphFont);
+			activityCell.addElement(activityPara);
+			activityCell.setBorderWidthTop(0);
+			reportItemTable.addCell(activityCell);
+
+			//Row 4
+
+			PdfPCell descriptionTitleCell = new PdfPCell();
+			Paragraph descriptionTitle = new Paragraph();
+			descriptionTitle.add(context.getResources().getString(R.string.dailyProgressDescription) + 
+					": " + reportItem.getDescription());
+			descriptionTitle.setFont(paragraphFont);
+			descriptionTitleCell.addElement(descriptionTitle);
+			descriptionTitleCell.setBorderWidthTop(0);
+			descriptionTitleCell.setColspan(2);
+			reportItemTable.addCell(descriptionTitleCell);
+
 			i++;
+			reportItemTable.setSpacingAfter(25);
+
+			if (heightUsed + reportItemTable.calculateHeights() > pageHeight) {
+				doc.newPage();
+				heightUsed = reportItemTable.getTotalHeight();
+			} else {
+				heightUsed = heightUsed + reportItemTable.getTotalHeight();
+			}
+			doc.add(reportItemTable);
+
 		}
+
 		datasourcePhotos.close();
 		datasourceLocations.close();
 		datasourceReportItems.close();
-		doc.add(contents);
 		doc.close();
+
 		return pdfPath;
 	}
-	
+
+	@SuppressLint("SimpleDateFormat")
 	private static String getOutputFile(SQLReport thisReport, Context context) throws IOException {
 
 		File StorageDir = FileManager.getPDFStorageLocation(context);
@@ -299,12 +431,12 @@ public class PDFCreator extends AsyncTask<Void, Void, String> {
 			int len = thisReport.getReportRef().length();
 			StringBuilder sb = new StringBuilder();
 			for (int i = 0; i < len; i++) {
-			    char ch = thisReport.getReportRef().charAt(i);
-			    if (ch < ' ' || ch >= 0x7F || ch == fileSep || (ch == '.') || ch == escape) {
-			        sb.append(escape);
-			    } else {
-			        sb.append(ch);
-			    }
+				char ch = thisReport.getReportRef().charAt(i);
+				if (ch < ' ' || ch >= 0x7F || ch == fileSep || (ch == '.') || ch == escape) {
+					sb.append(escape);
+				} else {
+					sb.append(ch);
+				}
 			}
 			String pdfFile = StorageDir.getPath() + File.separator + timeStamp + sb.toString() + ".pdf";
 			return pdfFile;

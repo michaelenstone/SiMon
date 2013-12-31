@@ -5,7 +5,6 @@ import java.util.Calendar;
 import java.util.List;
 
 import uk.co.simon.app.adapters.AdapterReportItems;
-import uk.co.simon.app.sqllite.DataSourcePhotos;
 import uk.co.simon.app.sqllite.DataSourceReportItems;
 import uk.co.simon.app.sqllite.DataSourceReports;
 import uk.co.simon.app.sqllite.SQLReport;
@@ -22,19 +21,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.bugsense.trace.BugSenseHandler;
 
 public class ActivityReport extends FragmentActivity implements uk.co.simon.app.DialogFragmentReportItem.onDialogResultListener, 
-	uk.co.simon.app.FragmentProgressReportHeader.onSpinnerSelect, uk.co.simon.app.DialogFragmentProjectEntry.onDialogResultListener {
+	uk.co.simon.app.FragmentProgressReportHeader.onSpinnerSelect {
 
 	DialogFragmentDate dateFragment;
 	Calendar now = Calendar.getInstance();
 
 	private DataSourceReportItems datasource;
 	private DataSourceReports reportsDatasource;
-	private DataSourcePhotos photosDatasource;
 	private SQLReport thisReport;
     FragmentProgressReportHeader header = new FragmentProgressReportHeader();
 	
@@ -98,8 +95,6 @@ public class ActivityReport extends FragmentActivity implements uk.co.simon.app.
           			    args.putBoolean("reportType", thisReport.getReportType());
           		    	args.putLong("projectId", thisReport.getProjectId());
           		    	args.putLong("reportId", thisReport.getId());
-        				Toast toast = Toast.makeText(getBaseContext(), "Project id: " + thisReport.getProjectId(), Toast.LENGTH_SHORT);
-        				toast.show();
           		    	FragmentManager fm = getSupportFragmentManager();
           		    	DialogFragmentReportItem dialogFragmentProgressReportItem = new DialogFragmentReportItem();
           		    	dialogFragmentProgressReportItem.setArguments(args);
@@ -108,8 +103,6 @@ public class ActivityReport extends FragmentActivity implements uk.co.simon.app.
           			    ListView reportItemsList = (ListView)findViewById(R.id.progressReportItemsList);
           				AdapterReportItems adapter = (AdapterReportItems) reportItemsList.getAdapter();
           				SQLReportItem reportItem = adapter.getItem(position);
-        				Toast toast = Toast.makeText(getBaseContext(), "Project id: " + thisReport.getProjectId(), Toast.LENGTH_SHORT);
-        				toast.show();
           		    	Bundle args = new Bundle();
           		    	args.putInt("dialogType", 1);
           			    args.putBoolean("reportType", thisReport.getReportType());
@@ -206,10 +199,6 @@ public class ActivityReport extends FragmentActivity implements uk.co.simon.app.
       	    datasource.open();
       	    datasource.deleteReportItem(reportItem);
       	    datasource.close();
-      	    photosDatasource = new DataSourcePhotos(getBaseContext());
-      	    photosDatasource.open();
-      	    photosDatasource.deleteReportItemPhotos(reportItem.getId());
-      	    photosDatasource.close();
     		showListView();
     		break;
     	}
@@ -234,12 +223,4 @@ public class ActivityReport extends FragmentActivity implements uk.co.simon.app.
 	public void onDialogPositiveClick(DialogFragment dialog) {
 		PopulateList(thisReport.getId());		
 	}
-
-	@Override
-	public void onProjectEntryPositiveClick(DialogFragment dialog) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
 	}

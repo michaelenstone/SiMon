@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="gen"/>
-	<classpathentry kind="src" path="src"/>
+	<classpathentry excluding="uk/co/simon/app/sensors/mySensorEventListener.java" kind="src" path="src"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
-	<classpathentry exported="true" kind="lib" path="libs/httpmime-4.2.5.jar"/>
-	<classpathentry exported="true" kind="lib" path="libs/droidText.0.4.jar"/>
+	<classpathentry kind="lib" path="libs/httpmime-4.2.5.jar"/>
 	<classpathentry kind="lib" path="libs/bugsense-3.5.jar"/>
 	<classpathentry kind="lib" path="libs/openbeans-1.0.jar"/>
+	<classpathentry kind="lib" path="libs/itextpdf-5.4.4.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

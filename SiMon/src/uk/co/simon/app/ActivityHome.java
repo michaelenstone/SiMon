@@ -1,7 +1,12 @@
 package uk.co.simon.app;
 
+import java.util.List;
+
 import uk.co.simon.app.filesAndSync.ProjectLocationAsync;
+import uk.co.simon.app.sqllite.DataSourceProjects;
+import uk.co.simon.app.sqllite.SQLProject;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,6 +16,8 @@ import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 
 import com.bugsense.trace.BugSenseHandler;
 
@@ -27,9 +34,30 @@ public class ActivityHome extends Activity {
 		context = this;
 		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
 		if (sharedPref.getBoolean("SyncPref", false)) {
-			ProjectLocationAsync mTask = new ProjectLocationAsync(context, this);
+    		ProgressDialog syncProgress = new ProgressDialog(this);
+    		syncProgress.setTitle(context.getString(R.string.menuSync));
+    		syncProgress.setMessage(context.getString(R.string.messageSync));
+			syncProgress.setCancelable(false);
+			syncProgress.show();
+			ProjectLocationAsync mTask = new ProjectLocationAsync(context, this, syncProgress);
 			mTask.execute((Void) null);
 		}
+		DataSourceProjects datasource = new DataSourceProjects(this);
+        datasource.open();
+        List<SQLProject> projects = datasource.getAllProjects();
+        datasource.close();
+        String Message = getResources().getString(R.string.homeText);
+        if (projects.size() < 1) {
+        	Button button1 = (Button) findViewById(R.id.homeButtonProgress);
+        	button1.setEnabled(false);
+        	Button button2 = (Button) findViewById(R.id.homeButtonSVR);
+        	button2.setEnabled(false);
+        	Button button3 = (Button) findViewById(R.id.homeButtonOpen);
+        	button3.setEnabled(false);
+        	Message = getResources().getString(R.string.firstHomeText);
+        }
+        TextView welcomeMessage = (TextView) findViewById(R.id.homeTextView);
+        welcomeMessage.setText(Message);
 	}
 
 	public void onClickHome(View view) {
@@ -50,11 +78,6 @@ public class ActivityHome extends Activity {
 			//Open Existing Reports Activity
 			Intent openExistingReport = new Intent(ActivityHome.this, ActivityReports.class);
 			startActivity(openExistingReport);
-			break;
-		case R.id.homeButtonProjects:
-			//Open Projects Activity
-			Intent openProjects = new Intent(ActivityHome.this, ActivityProjects.class);
-			startActivity(openProjects);
 			break;
 		}
 	}

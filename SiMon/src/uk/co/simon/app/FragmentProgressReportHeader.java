@@ -12,9 +12,7 @@ import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,7 +27,7 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 
-public class FragmentProgressReportHeader extends Fragment implements uk.co.simon.app.DialogFragmentProjectEntry.onDialogResultListener {
+public class FragmentProgressReportHeader extends Fragment {
 
 	DialogFragmentDate dateFragment;
 	Calendar now = Calendar.getInstance();
@@ -40,7 +38,6 @@ public class FragmentProgressReportHeader extends Fragment implements uk.co.simo
 	onSpinnerSelect spinnerSelect;
 	private boolean isNew;
 	private long reportId;
-	private boolean isFirst = false;
 	private String reportTypeRef;
 	SQLReport thisReport = new SQLReport();
 	Spinner projectsSpinner;
@@ -71,9 +68,9 @@ public class FragmentProgressReportHeader extends Fragment implements uk.co.simo
 		updateSpinner(projectsSpinner);
 
 		if (thisReport.getReportType()) {
-			reportTypeRef = "/SVR/";
+			reportTypeRef = this.getString(R.string.dailyProgressSVRRef);
 		} else {
-			reportTypeRef = "/PR/";
+			reportTypeRef = this.getString(R.string.dailyProgressPRRef);
 			LinearLayout weather = (LinearLayout) getView().findViewById(R.id.dailyProgressWeatherLayout);
 			weather.setVisibility(View.GONE);
 		}
@@ -103,57 +100,42 @@ public class FragmentProgressReportHeader extends Fragment implements uk.co.simo
 
 		projectsSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
 			public void onItemSelected(AdapterView<?> parentView, View view, int position, long id) {
-				if (!isFirst) {
-					if (position==1) {
-						SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity().getBaseContext());
-						int limit = sharedPref.getInt("ProjectLimit", 5);
-						if (noProjects < limit) {
-							//Prepare information for passing to dialog
-							Bundle args = new Bundle();
-							args.putInt("dialogType", 0);
-							FragmentManager fm = getFragmentManager();
-							DialogFragmentProjectEntry dialogFragmentProjectEntry = new DialogFragmentProjectEntry();
-							dialogFragmentProjectEntry.setArguments(args);
-							dialogFragmentProjectEntry.show(fm, "dialog_fragment_project_entry");
-						}
-					} else if (position!=0) {
-						SQLProject spinnerproject = (SQLProject) projectsSpinner.getAdapter().getItem(position);
-						datasource.open();
-						SQLProject project = datasource.getProject(spinnerproject.getId());
-						String projectNumber = project.getProjectNumber();
-						thisReport.setProjectId(project.getId());
-						String ref = projectNumber + reportTypeRef;
-						//get reports for particular project
-						reportsDatasource = new DataSourceReports(getActivity());
-						reportsDatasource.open();
-						List<SQLReport> reports = new ArrayList<SQLReport>();
-						reports = reportsDatasource.getAllProjectReports(spinnerproject.getId());
-						int i;
-						int thisRefNo = 1;
-						if (reports != null) {
-							if (thisReport.getReportType()) {	
-								for (i=0; i<reports.size(); i++) {
-									if (reports.get(i).getReportType()){
-										thisRefNo++;
-									}
+				if (position!=0) {
+					SQLProject spinnerproject = (SQLProject) projectsSpinner.getAdapter().getItem(position);
+					datasource.open();
+					SQLProject project = datasource.getProject(spinnerproject.getId());
+					String projectNumber = project.getProjectNumber();
+					thisReport.setProjectId(project.getId());
+					String ref = projectNumber + reportTypeRef;
+					//get reports for particular project
+					reportsDatasource = new DataSourceReports(getActivity());
+					reportsDatasource.open();
+					List<SQLReport> reports = new ArrayList<SQLReport>();
+					reports = reportsDatasource.getAllProjectReports(spinnerproject.getId());
+					int i;
+					int thisRefNo = 1;
+					if (reports != null) {
+						if (thisReport.getReportType()) {	
+							for (i=0; i<reports.size(); i++) {
+								if (reports.get(i).getReportType()){
+									thisRefNo++;
 								}
-							} else {
-								for (i=0; i<reports.size(); i++) {
-									if (!reports.get(i).getReportType()){
-										thisRefNo++;
-									}
+							}
+						} else {
+							for (i=0; i<reports.size(); i++) {
+								if (!reports.get(i).getReportType()){
+									thisRefNo++;
 								}
 							}
 						}
-						ref = ref + Integer.toString(thisRefNo);
-						refText.setText(ref);
-						thisReport.setReportRef(ref);
-						datasource.close();
-						reportsDatasource.close();
-						spinnerSelect.onSpinnerSelected(thisReport.getProjectId());
 					}
+					ref = ref + Integer.toString(thisRefNo);
+					refText.setText(ref);
+					thisReport.setReportRef(ref);
+					datasource.close();
+					reportsDatasource.close();
+					spinnerSelect.onSpinnerSelected(thisReport.getProjectId());
 				}
-				isFirst = false;
 			}
 			public void onNothingSelected(AdapterView<?> parentView) {
 
@@ -187,31 +169,20 @@ public class FragmentProgressReportHeader extends Fragment implements uk.co.simo
 
 		datasource = new DataSourceProjects(getActivity());
 		datasource.open();
-		
+
 		List<SQLProject> projects = new ArrayList<SQLProject>();
 		projects = datasource.getAllProjects();
-		noProjects = projects.size();
 
 		List<SQLProject> values = new ArrayList<SQLProject>();
 		SQLProject firstRow = new SQLProject();
 		if (isNew) {
-			firstRow.setId(-2);
+			firstRow.setId(-1);
 			firstRow.setProject(" ");
 		} else {      	
 			SQLProject project = datasource.getProject(thisReport.getProjectId());
 			firstRow = project;
 		}
 		values.add(firstRow);
-		SQLProject secondRow = new SQLProject();
-		secondRow.setId(-1);
-		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity().getBaseContext());
-		int limit = sharedPref.getInt("ProjectLimit", 5);
-		if (noProjects < limit) {
-			secondRow.setProject(getString(R.string.dailyProgressNewProject));
-		} else {
-			secondRow.setProject(getString(R.string.dailyProgressProjectLimitReached));
-		}
-		values.add(secondRow);
 		values.addAll(projects);
 		SpinnerAdapter adapter = new ArrayAdapter<SQLProject> (getActivity(), R.layout.spinner_row, values);
 		projectsSpinner.setAdapter(adapter);
@@ -267,7 +238,7 @@ public class FragmentProgressReportHeader extends Fragment implements uk.co.simo
 		if (isNew && projectsSpinner.getSelectedItemPosition()<=1) {
 			reportsDatasource = new DataSourceReports(getActivity());
 			reportsDatasource.open();
-			reportsDatasource.deleteReport(thisReport, false);
+			reportsDatasource.deleteReport(thisReport);
 			reportsDatasource.close();
 		} else {
 			reportsDatasource = new DataSourceReports(getActivity());
@@ -277,31 +248,4 @@ public class FragmentProgressReportHeader extends Fragment implements uk.co.simo
 		}
 	}
 
-	@Override
-	public void onProjectEntryPositiveClick(DialogFragment dialog) {
-		updateSpinner(projectsSpinner);
-		int position = projectsSpinner.getAdapter().getCount()-1;
-		projectsSpinner.setSelection(position);      
-
-		SQLProject spinnerproject = (SQLProject) projectsSpinner.getAdapter().getItem(position);
-		thisReport.setProjectId(spinnerproject.getId());
-		String projectNumber = spinnerproject.getProjectNumber();
-		String ref = projectNumber + "/PR/";
-		//get reports for particular project
-		reportsDatasource = new DataSourceReports(getActivity());
-		reportsDatasource.open();
-		List<SQLReport> reports = new ArrayList<SQLReport>();
-		reports = reportsDatasource.getAllProjectReports(spinnerproject.getId());
-		if (reports != null) {
-			int thisRefNo = reports.size()+1;
-			ref = ref + Integer.toString(thisRefNo);
-		} else {
-			int thisRefNo = 1;
-			ref = ref + Integer.toString(thisRefNo);
-		}
-		final EditText refText = (EditText) getView().findViewById(R.id.dailyProgressReportRefEditText);
-		refText.setText(ref);
-		reportsDatasource.close();
-
-	}
 }

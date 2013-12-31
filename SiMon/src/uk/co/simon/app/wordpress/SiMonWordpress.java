@@ -31,7 +31,6 @@ public class SiMonWordpress extends Wordpress {
 	
 	@SuppressWarnings("unchecked")
 	public List<WPProject> getProjects() throws XmlRpcFault {
-
 		XmlRpcArray r = this.simon.getProjects(super.username, super.password);
 		return super.fillFromXmlRpcArray(r, WPProject.class);
 	}
@@ -41,10 +40,10 @@ public class SiMonWordpress extends Wordpress {
 				project.getCloudID(), project.getProject(), project.getProjectNumber());
 	}
 	
-	public int projectLimit(SQLProject project) throws XmlRpcFault {
+	/*public int projectLimit(SQLProject project) throws XmlRpcFault {
 		return this.simon.projectLimit(this.username, this.password, 
 				project.getCloudID());
-	}
+	}*/
 
 	@SuppressWarnings("unchecked")
 	public List<WPLocation> getLocations(long projectId) throws XmlRpcFault {
@@ -90,8 +89,8 @@ interface SiMon {
 	int uploadProject(String username, String password, 
 			long cloudID, String projectName, String projectNumber) throws XmlRpcFault;
 	
-	int projectLimit(String username, String password, 
-			long cloudID)  throws XmlRpcFault;
+	/*int projectLimit(String username, String password, 
+			long cloudID)  throws XmlRpcFault;*/
 	
 	int uploadLocation(String username, String password, 
 			long cloudID, String location, long projectID) throws XmlRpcFault;

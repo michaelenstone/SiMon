@@ -29,7 +29,7 @@ public class DialogFragmentDate extends DialogFragment {
 		mDay = now.get(Calendar.DAY_OF_MONTH);
 		/*I dont really see the purpose of the below*/
 		Bundle args = new Bundle();
-		args.putString("title", "Set Date");
+		args.putString("title", context.getString(R.string.date_dialog_title));
 		dialog.setArguments(args);//setArguments can only be called before fragment is attached to an activity, so right after the fragment is created
 
 

@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.bugsense.trace.BugSenseHandler;
+
 import uk.co.simon.app.adapters.AdapterImages;
 import uk.co.simon.app.filesAndSync.FileManager;
 import uk.co.simon.app.sqllite.DataSourceLocations;
@@ -63,6 +65,8 @@ public class DialogFragmentReportItem extends DialogFragment {
 	onDialogResultListener mListener;
 	private SQLLocation thisLocation = new SQLLocation();
 	Context mContext;
+	private long projectId;
+	private boolean save = false;
 
 	public DialogFragmentReportItem() {
 	}
@@ -73,22 +77,24 @@ public class DialogFragmentReportItem extends DialogFragment {
 
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
 		mContext = getActivity(); 
+		BugSenseHandler.initAndStartSession(mContext, "6c6b0664");
+		projectId = getArguments().getLong("projectId");
 		AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 		LayoutInflater inflater = getActivity().getLayoutInflater();
 		view = inflater.inflate(R.layout.dialog_fragment_report_item, null);
 
 		final AutoCompleteTextView locationText = (AutoCompleteTextView) view.findViewById(R.id.dailyProgressLocationEditText);
 
-		locationsDatasource = new DataSourceLocations(getActivity());
+		locationsDatasource = new DataSourceLocations(mContext);
 		locationsDatasource.open();
 
 		List<SQLLocation> values = new ArrayList<SQLLocation>();
-		values.addAll(locationsDatasource.getAllProjectLocations(getArguments().getLong("projectId")));
+		values.addAll(locationsDatasource.getAllProjectLocations(projectId));
 
 		ArrayAdapter<SQLLocation> adapter = new ArrayAdapter<SQLLocation> (mContext, R.layout.spinner_row, values);
 		locationText.setAdapter(adapter);
 
-		datasource = new DataSourceReportItems(getActivity());
+		datasource = new DataSourceReportItems(mContext);
 		datasource.open();
 
 		if (getArguments().getBoolean("reportType")) {
@@ -99,6 +105,7 @@ public class DialogFragmentReportItem extends DialogFragment {
 		if (getArguments().getInt("dialogType")==1) {
 
 			thisReportItem = datasource.getReportItem(getArguments().getLong("reportItemId"));
+			save = true;
 
 			final EditText activityText = (EditText) view.findViewById(R.id.dailyProgressActivityEditText);
 			final EditText progressText = (EditText) view.findViewById(R.id.dailyProgressProgressEditText);
@@ -128,13 +135,13 @@ public class DialogFragmentReportItem extends DialogFragment {
 
 		locationsDatasource.close();
 		datasource.close();
-		thisLocation.setLocationProjectId(getArguments().getLong("projectId"));
+		thisLocation.setLocationProjectId(projectId);
 		
 		builder.setPositiveButton(R.string.dailyProgressItemOK, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int whichButton) {	        	 
-				locationsDatasource = new DataSourceLocations(getActivity());
+				locationsDatasource = new DataSourceLocations(mContext);
 				locationsDatasource.open();
-				datasource = new DataSourceReportItems(getActivity());
+				datasource = new DataSourceReportItems(mContext);
 				datasource.open();
 				thisLocation.setLocation(locationText.getText().toString());
 				try {
@@ -146,6 +153,7 @@ public class DialogFragmentReportItem extends DialogFragment {
 				datasource.updateReportItem(packageReportItem(thisLocation.getId()));
 				datasource.close();
 				mListener.onDialogPositiveClick(DialogFragmentReportItem.this);
+				save = true;
 				dismiss();
 			}
 		});
@@ -155,7 +163,7 @@ public class DialogFragmentReportItem extends DialogFragment {
 
 		takePhoto.setOnClickListener(new OnClickListener() {
 			public void onClick(View view) {
-				Intent newTakePhoto = new Intent(getActivity(), ActivityTakePhoto.class);
+				Intent newTakePhoto = new Intent(mContext, ActivityTakePhoto.class);
 				newTakePhoto.putExtra("reportItemId", thisReportItem.getId());
 				startActivityForResult(newTakePhoto, REQ_CODE_TAKE_IMAGE);
 			}
@@ -193,6 +201,12 @@ public class DialogFragmentReportItem extends DialogFragment {
 	}
 
 	public void onDismiss(DialogInterface dialog) {
+		if (!save) {
+			datasource = new DataSourceReportItems(mContext);
+			datasource.open();
+			datasource.deleteReportItem(thisReportItem);
+			datasource.close();
+		}
 		super.onDismiss(dialog);
 	}
 
@@ -231,12 +245,12 @@ public class DialogFragmentReportItem extends DialogFragment {
 
 		final ExpandableHeightGridView gridView = (ExpandableHeightGridView) view.findViewById(R.id.dailyProgressPhotosGrid);
 
-		photosDatasource = new DataSourcePhotos(getActivity());
+		photosDatasource = new DataSourcePhotos(mContext);
 		photosDatasource.open();
 
 		List<SQLPhoto> images = photosDatasource.getReportItemPhotos(thisReportItem.getId());
 		photosDatasource.close();
-		AdapterImages adapter = new AdapterImages(getActivity(), images);
+		AdapterImages adapter = new AdapterImages(mContext, images);
 
 		gridView.setAdapter(adapter);
 		gridView.setExpanded(true);
@@ -269,8 +283,12 @@ public class DialogFragmentReportItem extends DialogFragment {
 						intent.setDataAndType(Uri.fromFile(photoFile), "image/*");
 						startActivity(intent);
 					} else {
-						Toast toast = Toast.makeText(view.getContext(), "Photo File Doesn't Exist", Toast.LENGTH_SHORT);
+						Toast toast = Toast.makeText(view.getContext(), mContext.getString(R.string.errPhotoFileDoesntExist), Toast.LENGTH_SHORT);
 						toast.show();
+						photosDatasource = new DataSourcePhotos(mContext);
+						photosDatasource.open();
+						photosDatasource.deletePhoto(photo);
+						photosDatasource.close();
 					}
 					return true;
 				}
@@ -281,7 +299,7 @@ public class DialogFragmentReportItem extends DialogFragment {
 					AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
 					AdapterImages adapter = (AdapterImages) gridView.getAdapter();
 					SQLPhoto photo = adapter.getSQLPhoto(info.position);
-					photosDatasource = new DataSourcePhotos(getActivity());
+					photosDatasource = new DataSourcePhotos(mContext);
 					photosDatasource.open();
 					photosDatasource.deletePhoto(photo);
 					photosDatasource.close();
@@ -324,11 +342,9 @@ public class DialogFragmentReportItem extends DialogFragment {
 						src.close();
 						dst.close();
 					} catch (FileNotFoundException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						BugSenseHandler.sendEvent(e.toString());
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						BugSenseHandler.sendEvent(e.toString());
 					}
                 }
 				
@@ -337,7 +353,7 @@ public class DialogFragmentReportItem extends DialogFragment {
 				newPhoto.setPhoto(destinationFile.getAbsolutePath());
 				newPhoto.setReportItemId(thisReportItem.getId());
 				newPhoto.setLocationId(thisReportItem.getLocationId());
-				photosDatasource = new DataSourcePhotos(getActivity());
+				photosDatasource = new DataSourcePhotos(mContext);
 				photosDatasource.open();
 				photosDatasource.createPhoto(newPhoto);
 				photosDatasource.close();

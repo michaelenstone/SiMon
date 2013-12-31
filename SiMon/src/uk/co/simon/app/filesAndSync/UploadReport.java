@@ -28,16 +28,12 @@ public class UploadReport extends AsyncTask<Void, Void, Boolean> {
 	protected Boolean doInBackground(Void... params) {
 		Sync sync = new Sync(context);
 		if (sync.networkIsAvailable()) {
-			if (sync.singleProjectSync(report.getProjectId())) {
-				DataSourceProjects datasource = new DataSourceProjects(context);
-				datasource.open();
-				SQLProject project = datasource.getProject(report.getProjectId());
-				datasource.close();
-				if (sync.locationSync(project)){
-					return sync.reportSync(report);
-				} else {
-					return false;
-				}
+			DataSourceProjects datasource = new DataSourceProjects(context);
+			datasource.open();
+			SQLProject project = datasource.getProject(report.getProjectId());
+			datasource.close();
+			if (sync.locationSync(project)){
+				return sync.reportSync(report);
 			} else {
 				return false;
 			}

@@ -3,6 +3,8 @@ package uk.co.simon.app.sqllite;
 import java.util.ArrayList;
 import java.util.List;
 
+import uk.co.simon.app.R;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -81,10 +83,21 @@ public class DataSourceReportItems {
 	}
 
 	public void deleteReportItem(SQLReportItem reportItem) {
+		DataSourcePhotos datasourcePhotos = new DataSourcePhotos(context);
+		datasourcePhotos.open();
+		datasourcePhotos.deleteReportItemPhotos(reportItem.getId());
+		datasourcePhotos.close();
 		database.delete(SQLiteHelper.REPORT_ITEMS_TABLE_NAME, 
 				SQLiteHelper.COLUMN_ID + " = " + reportItem.getId(), null);
-		Toast toast = Toast.makeText(context, "Report deleted with id: " + reportItem.getId(), Toast.LENGTH_SHORT);
+		Toast toast = Toast.makeText(context, context.getString(R.string.msgReportItemDeleted) + reportItem.getId(), Toast.LENGTH_SHORT);
 		toast.show();
+	}
+	
+	public void deleteReportItems(SQLReport report) {
+		List<SQLReportItem> reportItems = getReportItems(report.getId());
+		for (SQLReportItem reportItem : reportItems) {
+			deleteReportItem(reportItem);
+		}
 	}
 
 	public List<SQLReportItem> getAllReportItems() {
@@ -109,7 +122,7 @@ public class DataSourceReportItems {
 
 		Cursor cursor = database.query(SQLiteHelper.REPORT_ITEMS_TABLE_NAME,
 				allColumns, SQLiteHelper.COLUMN_REPORT_ID + " = " + reportId, null,
-				null, null, null);
+				null, null, SQLiteHelper.COLUMN_ID + " DESC");
 
 		cursor.moveToFirst();
 		while (!cursor.isAfterLast()) {

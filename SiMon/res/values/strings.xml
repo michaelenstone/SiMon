@@ -7,7 +7,8 @@
     <string name="menuHome">Home</string>
     <string name="menuChangeReportType">Change Report Type</string>    
     <string name="menuLogout">Logout</string>    
-    <string name="menuSync">Sync Projects and Locations</string>
+    <string name="menuSync">Sync Projects and Locations</string>    
+    <string name="messageSync">Syncing</string>
     <string name="preferencesName">Name</string>
     <string name="preferencesNameSummary">Enter Name to be used in Author Field on Submissions</string>
     <string name="preferencesEmail">Email</string>
@@ -16,10 +17,15 @@
     <string name="preferencesPasswordSummary">Enter the Password you use to login to SiMon online</string>
     <string name="preferencesApplicationSync">Auto-sync Projects &amp; Locations</string>
     <string name="preferencesApplicationSyncSummary">Select this option to automatically sync projects and locations on start - THIS OPTION MAY INCUR ADDITIONAL DATA USAGE COSTS</string>
+    <string name="preferencesAutoFocus">Auto Focus Camera</string>
+    <string name="preferencesAutoFocusSummary">If you have issues with the focus when taking images this setting may help</string>
+    <string name="preferencesSelectLogo">Logo</string>
+    <string name="preferencesSelectLogoSummary">Select a Logo for use in PDF reports</string>
       
-    <!-- Strings for Alert Dialogs -->
+    <!-- Strings for Dialogs -->
     <string name="alert_dialog_ok">OK</string>
     <string name="alert_dialog_cancel">Cancel</string> 
+    <string name="date_dialog_title">Set Date</string> 
     
     <!-- Strings for Context Menus -->    
     <string name="contextProgressReports">Progress Reports</string>
@@ -31,13 +37,6 @@
     <string name="contextOpenPDF">Open PDF</string>
     <string name="contextUpload">Upload Report</string>
     <string name="contextView">View</string>
-    
-    <!-- Strings for Project Entry Dialog Fragment -->
-    <string name="newProject">New</string>
-    <string name="newProjectEntryDialogTitle">Enter New Project Details</string>
-    <string name="updateProjectEntryDialogTitle">Update Project Details</string>
-    <string name="projectEntryProjectName">Project Name</string>
-    <string name="projectEntryProjectNumber">Project Number</string>
 
     <!-- Strings for Home Activity -->
     <string name="title_activity_home">SiMon - Site Monitor</string>
@@ -45,7 +44,8 @@
     <string name="homeButtonSVR">New Site Visit Report</string>
     <string name="homeButtonOpen">Manage Existing Reports</string>
     <string name="homeLogoDescription">Company Logo</string>
-    <string name="homeButtonProjects">Manage Projects</string>
+    <string name="homeText">Welcome to SiMon</string>
+    <string name="firstHomeText">Welcome to SiMon.  To start using SiMon please add a project via the website</string>
 
     <!-- Strings for Daily Progress Report Header Fragment -->
     <string name="title_activity_progress_reports">Progress Reports</string>
@@ -57,7 +57,8 @@
     <string name="dailyProgressWeather">Weather</string>
     <string name="dailyProgressTemp">Temp</string>
     <string name="dailyProgressSupervisor">Report Author</string>
-    <string name="dailyProgressLabour">Labour</string>
+    <string name="dailyProgressSVRRef">/SVR/</string>
+    <string name="dailyProgressPRRef">/PR/</string>
 
     <string-array name="dailyProgressTempType">
         <item>&#xb0;C</item>
@@ -83,44 +84,28 @@
         <item>Behind</item>
     </string-array>
 
-    <!-- Strings for Site Visit Report Header Fragment -->
-    <string name="SVRProject">Project:</string>
-    <string name="SVRDate">Date</string>
-    <string name="SVRReportRef">Report Ref</string>
-    <string name="SVRWeather">Weather</string>
-    <string name="SVRTemp">Temp</string>
-    <string name="SVRSupervisor">Supervisor</string>
-
-    <string-array name="SVRTempType">
-        <item>&#xb0;C</item>
-        <item>&#xb0;F</item>
-    </string-array>
-
-    <!-- Strings for Site Visit Report Item Fragment -->
-    <string name="SVRLocation">Location:</string>
-    <string name="SVRActivity">Activity</string>
-    <string name="SVRDescription">Description</string>
-    <string name="SVRTakePhoto">Take Photo</string>
-    <string name="SVRAttachPhoto">Attach Photo</string>
-    <string name="menu_settings">Settings</string>
+    <!-- Strings for Activity Titles -->
     <string name="title_activity_progress_report">Progress Report</string>
     <string name="title_activity_site_visit_report">Site Visit Report</string>
     <string name="title_activity_existing_reports">Existing Reports</string>
     <string name="title_activity_settings">Settings</string>
-    <string name="title_activity_dialog_fragment_project_entry">DialogFragmentProjectEntry</string>
+    <string name="title_activity_dialog_fragment_project_entry">DialogFragmentProjectEntry</string> 
 
     <!-- Strings for Settings Menu -->
     <string name="settingsMenuManageProjects">Manage Projects</string>
     <string name="title_activity_dialog_fragment_date">DialogFragmentDate</string>
 
-    <!-- Strings for Projects Manager -->
-    <string name="title_activity_projects">Manage Projects</string>
-    <string name="projectsManagerTitle">Projects</string>
-
     <!-- Strings for Reports Manager -->
     <string name="title_activity_reports">Manage Reports</string>
     <string name="reportsManagerTitle">Reports</string>
     <string name="filterReports">Filter</string>
+    <string name="newReport">New</string>
+    <string name="newReportDialogTitle">New Report</string>
+    <string name="newReportDialogText">Select Type of Report</string>
+    <string name="deleteReportDialogTitle">Delete Report</string>
+    <string name="deleteReportDialogText">Confirm Delete. Note: If this report has been uploaded a copy will remain on the server accessible via your normal login</string>
+    <string name="uploadReportDialogTitle">Upload Report</string>
+    <string name="uploadReportDialogText">Uploading Report&#8230;</string>
     
     <!-- Strings for Take Photo Activity -->
     <string name="title_activity_photos">Take Photo</string>
@@ -131,21 +116,29 @@
     <string name="discardPhotoButton">Discard Photo</string>
     
     <!--  Strings for PDF Generation -->
+    <string name="createPDFDialogTitle">PDFCreator</string>
+    <string name="createPDFDialogText">Creating PDF&#8230;</string>
     <string name="pdfProgressReportTitle">Daily Progress Report</string>
     <string name="pdfSiteVisitReportTitle">Site Visit Report</string>
-    <string name="pdfNoColumn">No.</string>
-    <string name="pdfItemColumn">Item</string>
+    <string name="pdfItem">Item</string>
     <string name="pdfProgress">Progress</string>
+    <string name="pdfSuccess">PDF Created</string>
+    <string name="pdfFailure">Could not create PDF</string>
     
     <!--  Error Messages -->
-    <string name="errProjectServerLimit">Too many projects to sync: delete a project on device or web</string>
-    <string name="errProjectDeviceLimit">Too many projects to sync: delete a project on device or web</string>
     <string name="errPhotoStorageLimit">Photo Storage Limit has been reached please remove some images</string>
+    <string name="errPDFDelete">Old PDF could not be deleted</string>
+    <string name="errPhotoFileDoesntExist">Photo File doesn\'t exist.  Photo Reference Removed</string>
+    <string name="errFileNotFound">File not found</string>
+    <string name="errCreatingDirectory">Error Creating Directory. Check Permissions</string>
     
     <!--  Messages -->
     <string name="msgSyncSuccess">Sync Successful</string>
     <string name="msgSyncFail">Sync Failed</string>
     <string name="msgUploadSuccess">Upload Successful</string>
     <string name="msgUploadFail">Upload Failed</string>
+    <string name="msgPhotoDeleted">Photo Deleted with ID: </string>
+    <string name="msgReportItemDeleted">Report Item Deleted with ID: </string>
+    <string name="msgReportDeleted">Report Deleted with ID: </string>
 
 </resources>

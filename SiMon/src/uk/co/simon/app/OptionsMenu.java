@@ -2,6 +2,7 @@ package uk.co.simon.app;
 
 import uk.co.simon.app.filesAndSync.ProjectLocationAsync;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -33,7 +34,12 @@ public class OptionsMenu {
 			activity.startActivity(openSettings);
 			return true;
 		case R.id.menuSync:
-			ProjectLocationAsync mTask = new ProjectLocationAsync(context, activity);
+    		ProgressDialog syncProgress = new ProgressDialog(activity);
+    		syncProgress.setTitle(context.getString(R.string.menuSync));
+    		syncProgress.setMessage(context.getString(R.string.messageSync));
+			syncProgress.setCancelable(false);
+			syncProgress.show();
+			ProjectLocationAsync mTask = new ProjectLocationAsync(context, activity, syncProgress);
 			mTask.execute((Void) null);
 			return true;
 		case R.id.menuLogout:
