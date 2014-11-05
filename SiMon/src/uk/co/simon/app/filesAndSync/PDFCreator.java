@@ -129,14 +129,14 @@ public class PDFCreator extends AsyncTask<Void, Void, String> {
 		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
 		String customLogoPath = sharedPref.getString("imagePicker", null);
 		boolean useDefaultLogo = true;
-		
+
 		if (customLogoPath != null ) {
 			File customLogo = new File(customLogoPath);
 			if (customLogo.exists()) {
 				useDefaultLogo = false;
 			}
 		}
-		
+
 		if (useDefaultLogo) {
 			Bitmap logoImageResource = BitmapFactory.decodeResource(context.getResources(), R.drawable.logo_white_bg);
 			ByteArrayOutputStream logoStream = new ByteArrayOutputStream();
@@ -169,7 +169,7 @@ public class PDFCreator extends AsyncTask<Void, Void, String> {
 			rawImage.recycle();
 			scaledBitmap.recycle();
 		}
-		
+
 		PdfPCell titleCell = new PdfPCell();
 		Paragraph titlePara = new Paragraph();
 		if (thisReport.getReportType()) {
@@ -287,7 +287,7 @@ public class PDFCreator extends AsyncTask<Void, Void, String> {
 			locationTitle.add(context.getResources().getString(R.string.dailyProgressLocation));
 			locationTitle.setFont(paragraphFont);
 			locationTitleCell.addElement(locationTitle);
-			locationTitleCell.setBorderWidthTop(0);
+			locationTitleCell.setBorderWidth(0);
 			reportItemTable.addCell(locationTitleCell);
 
 			PdfPCell locationCell = new PdfPCell();
@@ -296,7 +296,7 @@ public class PDFCreator extends AsyncTask<Void, Void, String> {
 			locationPara.add(location.getLocation());
 			locationPara.setFont(paragraphFont);
 			locationCell.addElement(locationPara);
-			locationCell.setBorderWidthTop(0);
+			locationCell.setBorderWidth(0);
 			reportItemTable.addCell(locationCell);
 
 			PdfPCell photosCell = new PdfPCell();
@@ -337,7 +337,7 @@ public class PDFCreator extends AsyncTask<Void, Void, String> {
 					photoTable.addCell(blankCell);
 				}
 				photosCell.addElement(photoTable);
-				
+
 			} else if (photos.size() == 1) {
 
 				PdfPTable photoTable = new PdfPTable(1);
@@ -363,6 +363,30 @@ public class PDFCreator extends AsyncTask<Void, Void, String> {
 					scaledBitmap.recycle();
 				}
 				photosCell.addElement(photoTable);
+
+			} else {
+
+				PdfPTable photoTable = new PdfPTable(1);
+				float[] photoColumnWidths = {100f};
+				photoTable.setWidths(photoColumnWidths);
+				photoTable.setTotalWidth(pageWidth*0.7f);
+				photoTable.getDefaultCell().setBorder(Rectangle.NO_BORDER);
+				photoTable.getDefaultCell().setPadding(5f);
+
+				final BitmapFactory.Options photoOptions = new BitmapFactory.Options();
+				photoOptions.inJustDecodeBounds = false;
+				Bitmap rawImage = BitmapFactory.decodeResource(context.getResources(), R.drawable.placeholder);
+				float scale = Math.min(1040f/((float) rawImage.getWidth()), 1);
+				Bitmap scaledBitmap = Bitmap.createScaledBitmap(rawImage, (int)Math.ceil(rawImage.getWidth()*scale), (int)Math.ceil(rawImage.getHeight()*scale), true);
+				ByteArrayOutputStream photoStream = new ByteArrayOutputStream();
+				scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 75, photoStream);
+				Image photoImage = Image.getInstance(photoStream.toByteArray());
+				photoImage.setCompressionLevel(9);
+				photoTable.addCell(photoImage);
+				rawImage.recycle();
+				scaledBitmap.recycle();
+				photosCell.addElement(photoTable);
+				
 			}
 			photosCell.setBorderWidthTop(0);
 			photosCell.setRowspan(3);
@@ -375,7 +399,7 @@ public class PDFCreator extends AsyncTask<Void, Void, String> {
 			activityTitle.add(context.getResources().getString(R.string.dailyProgressActivity));
 			activityTitle.setFont(paragraphFont);
 			activityTitleCell.addElement(activityTitle);
-			activityTitleCell.setBorderWidthTop(0);
+			activityTitleCell.setBorderWidth(0);
 			reportItemTable.addCell(activityTitleCell);
 
 			PdfPCell activityCell = new PdfPCell();
@@ -383,7 +407,7 @@ public class PDFCreator extends AsyncTask<Void, Void, String> {
 			activityPara.add(reportItem.getReportItem());
 			activityPara.setFont(paragraphFont);
 			activityCell.addElement(activityPara);
-			activityCell.setBorderWidthTop(0);
+			activityCell.setBorderWidth(0);
 			reportItemTable.addCell(activityCell);
 
 			//Row 4
@@ -394,7 +418,7 @@ public class PDFCreator extends AsyncTask<Void, Void, String> {
 					": " + reportItem.getDescription());
 			descriptionTitle.setFont(paragraphFont);
 			descriptionTitleCell.addElement(descriptionTitle);
-			descriptionTitleCell.setBorderWidthTop(0);
+			descriptionTitleCell.setBorderWidth(0);
 			descriptionTitleCell.setColspan(2);
 			reportItemTable.addCell(descriptionTitleCell);
 
