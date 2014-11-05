@@ -40,9 +40,9 @@
 
     <!-- Strings for Home Activity -->
     <string name="title_activity_home">SiMon - Site Monitor</string>
-    <string name="homeButtonProgress">New Progress Report</string>
-    <string name="homeButtonSVR">New Site Visit Report</string>
-    <string name="homeButtonOpen">Manage Existing Reports</string>
+    <string name="homeButtonReports">Reports</string>
+    <string name="homeButtonSettings">Settings</string>
+    <string name="homeButtonSync">Sync Projects and Locations</string>
     <string name="homeLogoDescription">Company Logo</string>
     <string name="homeText">Welcome to SiMon</string>
     <string name="firstHomeText">Welcome to SiMon.  To start using SiMon please add a project via the website</string>

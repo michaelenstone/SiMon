@@ -39,11 +39,11 @@ public class ActivityHome extends Activity {
 		datasource.close();
 		String Message = getResources().getString(R.string.homeText);
 		if (projects.size() < 1) {
-			Button button1 = (Button) findViewById(R.id.homeButtonProgress);
+			Button button1 = (Button) findViewById(R.id.homeButtonReports);
 			button1.setEnabled(false);
-			Button button2 = (Button) findViewById(R.id.homeButtonSVR);
+			Button button2 = (Button) findViewById(R.id.homeButtonSettings);
 			button2.setEnabled(false);
-			Button button3 = (Button) findViewById(R.id.homeButtonOpen);
+			Button button3 = (Button) findViewById(R.id.homeButtonSync);
 			button3.setEnabled(false);
 			Message = getResources().getString(R.string.firstHomeText);
 		} else {
@@ -63,22 +63,25 @@ public class ActivityHome extends Activity {
 
 	public void onClickHome(View view) {
 		switch (view.getId()) {
-		case R.id.homeButtonProgress:
+		case R.id.homeButtonReports:
 			//Start Progress Report Activity
-			Intent newProgressReport = new Intent(ActivityHome.this, ActivityReport.class);
-			newProgressReport.putExtra("reportType", false);
-			startActivity(newProgressReport);
-			break;
-		case R.id.homeButtonSVR:
-			//Start Site Visit Report Activity
-			Intent newSiteVisitReport = new Intent(ActivityHome.this, ActivityReport.class);
-			newSiteVisitReport.putExtra("reportType", true);
-			startActivity(newSiteVisitReport);
-			break;
-		case R.id.homeButtonOpen:
-			//Open Existing Reports Activity
 			Intent openExistingReport = new Intent(ActivityHome.this, ActivityReports.class);
 			startActivity(openExistingReport);
+			break;
+		case R.id.homeButtonSettings:
+			//Start Site Visit Report Activity
+			Intent openSettings = new Intent(ActivityHome.this, ActivitySettings.class);
+			startActivity(openSettings);
+			break;
+		case R.id.homeButtonSync:
+			//Open Existing Reports Activity
+			ProgressDialog syncProgress = new ProgressDialog(this);
+			syncProgress.setTitle(context.getString(R.string.menuSync));
+			syncProgress.setMessage(context.getString(R.string.messageSync));
+			syncProgress.setCancelable(false);
+			syncProgress.show();
+			ProjectLocationAsync mTask = new ProjectLocationAsync(context, this, syncProgress);
+			mTask.execute((Void) null);
 			break;
 		}
 	}

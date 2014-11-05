@@ -37,28 +37,28 @@
         android:textAppearance="?android:attr/textAppearanceMedium" />
         
     <Button
-        android:id="@+id/homeButtonProgress"
+        android:id="@+id/homeButtonReports"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:onClick="onClickHome"
-        android:text="@string/homeButtonProgress" />
+        android:text="@string/homeButtonReports" />
 
     <Button
-        android:id="@+id/homeButtonSVR"
+        android:id="@+id/homeButtonSettings"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
-        android:text="@string/homeButtonSVR" 
-        android:onClick="onClickHome"/>
+        android:onClick="onClickHome"
+        android:text="@string/homeButtonSettings" />
 
     <Button
-        android:id="@+id/homeButtonOpen"
+        android:id="@+id/homeButtonSync"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
-        android:text="@string/homeButtonOpen" 
-        android:onClick="onClickHome"/>
+        android:onClick="onClickHome"
+        android:text="@string/homeButtonSync" />
     
     </LinearLayout>
 
