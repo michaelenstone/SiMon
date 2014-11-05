@@ -33,31 +33,32 @@ public class ActivityHome extends Activity {
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		context = this;
 		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-		if (sharedPref.getBoolean("SyncPref", false)) {
-    		ProgressDialog syncProgress = new ProgressDialog(this);
-    		syncProgress.setTitle(context.getString(R.string.menuSync));
-    		syncProgress.setMessage(context.getString(R.string.messageSync));
-			syncProgress.setCancelable(false);
-			syncProgress.show();
-			ProjectLocationAsync mTask = new ProjectLocationAsync(context, this, syncProgress);
-			mTask.execute((Void) null);
-		}
 		DataSourceProjects datasource = new DataSourceProjects(this);
-        datasource.open();
-        List<SQLProject> projects = datasource.getAllProjects();
-        datasource.close();
-        String Message = getResources().getString(R.string.homeText);
-        if (projects.size() < 1) {
-        	Button button1 = (Button) findViewById(R.id.homeButtonProgress);
-        	button1.setEnabled(false);
-        	Button button2 = (Button) findViewById(R.id.homeButtonSVR);
-        	button2.setEnabled(false);
-        	Button button3 = (Button) findViewById(R.id.homeButtonOpen);
-        	button3.setEnabled(false);
-        	Message = getResources().getString(R.string.firstHomeText);
-        }
-        TextView welcomeMessage = (TextView) findViewById(R.id.homeTextView);
-        welcomeMessage.setText(Message);
+		datasource.open();
+		List<SQLProject> projects = datasource.getAllProjects();
+		datasource.close();
+		String Message = getResources().getString(R.string.homeText);
+		if (projects.size() < 1) {
+			Button button1 = (Button) findViewById(R.id.homeButtonProgress);
+			button1.setEnabled(false);
+			Button button2 = (Button) findViewById(R.id.homeButtonSVR);
+			button2.setEnabled(false);
+			Button button3 = (Button) findViewById(R.id.homeButtonOpen);
+			button3.setEnabled(false);
+			Message = getResources().getString(R.string.firstHomeText);
+		} else {
+			if (sharedPref.getBoolean("SyncPref", false)) {
+				ProgressDialog syncProgress = new ProgressDialog(this);
+				syncProgress.setTitle(context.getString(R.string.menuSync));
+				syncProgress.setMessage(context.getString(R.string.messageSync));
+				syncProgress.setCancelable(false);
+				syncProgress.show();
+				ProjectLocationAsync mTask = new ProjectLocationAsync(context, this, syncProgress);
+				mTask.execute((Void) null);
+			}
+		}
+		TextView welcomeMessage = (TextView) findViewById(R.id.homeTextView);
+		welcomeMessage.setText(Message);
 	}
 
 	public void onClickHome(View view) {

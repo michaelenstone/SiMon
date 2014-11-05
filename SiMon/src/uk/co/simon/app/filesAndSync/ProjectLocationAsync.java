@@ -1,11 +1,9 @@
 package uk.co.simon.app.filesAndSync;
 
-import uk.co.simon.app.ActivityHome;
 import uk.co.simon.app.R;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
@@ -35,11 +33,6 @@ public class ProjectLocationAsync extends AsyncTask<Void, Void, Boolean> {
 		try {
 			progress.dismiss();
 		} catch (Exception e) {	
-		}
-		if (activity.getClass().getSimpleName().contains("ActivityHome")) {
-			activity.finish();
-			Intent home = new Intent(activity, ActivityHome.class);
-			activity.startActivity(home);
 		}
 		if (success) {
 			Toast.makeText(context, activity.getString(R.string.msgSyncSuccess), Toast.LENGTH_SHORT).show();
