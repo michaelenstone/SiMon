@@ -235,7 +235,7 @@ public class FragmentProgressReportHeader extends Fragment {
 
 	public void onDetach(){
 		super.onDetach();
-		if (isNew && projectsSpinner.getSelectedItemPosition()<=1) {
+		if (isNew && projectsSpinner.getSelectedItemPosition()<1) {
 			reportsDatasource = new DataSourceReports(getActivity());
 			reportsDatasource.open();
 			reportsDatasource.deleteReport(thisReport);

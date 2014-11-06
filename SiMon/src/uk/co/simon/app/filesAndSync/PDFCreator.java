@@ -388,7 +388,7 @@ public class PDFCreator extends AsyncTask<Void, Void, String> {
 				photosCell.addElement(photoTable);
 				
 			}
-			photosCell.setBorderWidthTop(0);
+			photosCell.setBorderWidth(0);
 			photosCell.setRowspan(3);
 			reportItemTable.addCell(photosCell);
 
