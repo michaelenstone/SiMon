@@ -29,7 +29,6 @@ import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 
-import com.bugsense.trace.BugSenseHandler;
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
@@ -42,6 +41,7 @@ import com.itextpdf.text.pdf.CMYKColor;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
+import com.splunk.mint.Mint;
 
 public class PDFCreator extends AsyncTask<Void, Void, String> {
 
@@ -80,7 +80,7 @@ public class PDFCreator extends AsyncTask<Void, Void, String> {
 			message = context.getString(R.string.pdfSuccess);
 		} else {
 			message = context.getString(R.string.pdfFailure);
-			BugSenseHandler.sendEvent(result);
+			Mint.logEvent(result);
 		}
 		Toast toast = Toast.makeText(context, message, Toast.LENGTH_LONG);
 		try {

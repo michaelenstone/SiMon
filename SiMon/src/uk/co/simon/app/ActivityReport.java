@@ -22,7 +22,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import com.bugsense.trace.BugSenseHandler;
+import com.splunk.mint.Mint;
 
 public class ActivityReport extends FragmentActivity implements uk.co.simon.app.DialogFragmentReportItem.onDialogResultListener, 
 	uk.co.simon.app.FragmentProgressReportHeader.onSpinnerSelect {
@@ -39,7 +39,7 @@ public class ActivityReport extends FragmentActivity implements uk.co.simon.app.
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-		BugSenseHandler.initAndStartSession(ActivityReport.this, "6c6b0664");        
+		Mint.initAndStartSession(ActivityReport.this, "6c6b0664");        
         setContentView(R.layout.activity_report);
         
         reportsDatasource = new DataSourceReports(this);

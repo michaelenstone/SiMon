@@ -6,8 +6,8 @@
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
 	<classpathentry kind="lib" path="libs/httpmime-4.2.5.jar"/>
-	<classpathentry kind="lib" path="libs/bugsense-3.5.jar"/>
 	<classpathentry kind="lib" path="libs/openbeans-1.0.jar"/>
-	<classpathentry kind="lib" path="libs/itextpdf-5.4.4.jar"/>
+	<classpathentry kind="lib" path="libs/itextpdf-5.5.3.jar"/>
+	<classpathentry kind="lib" path="/Users/michaelenstone/Documents/SiMon/SiMon/libs/mint-4.0.6.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

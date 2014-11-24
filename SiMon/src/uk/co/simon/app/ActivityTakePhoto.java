@@ -31,7 +31,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.bugsense.trace.BugSenseHandler;
+import com.splunk.mint.Mint;
 
 public class ActivityTakePhoto extends Activity {
 
@@ -53,7 +53,7 @@ public class ActivityTakePhoto extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		BugSenseHandler.initAndStartSession(ActivityTakePhoto.this, "6c6b0664");
+		Mint.initAndStartSession(ActivityTakePhoto.this, "6c6b0664");
 		setContentView(R.layout.activity_take_photo);
 
 		camera = getCameraInstance();

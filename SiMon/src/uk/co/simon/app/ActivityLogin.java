@@ -26,7 +26,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.bugsense.trace.BugSenseHandler;
+import com.splunk.mint.Mint;
 
 /**
  * Activity which displays a login screen to the user, offering registration as
@@ -55,7 +55,7 @@ public class ActivityLogin extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		BugSenseHandler.initAndStartSession(ActivityLogin.this, "6c6b0664");
+		Mint.initAndStartSession(ActivityLogin.this, "6c6b0664");
 		context = this;
 		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
 		String mEmail = sharedPref.getString("EmailPref", null);

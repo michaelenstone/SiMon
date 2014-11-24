@@ -9,11 +9,12 @@ import uk.co.simon.app.sqllite.DataSourceReports;
 import uk.co.simon.app.sqllite.SQLProject;
 import uk.co.simon.app.sqllite.SQLReport;
 import android.app.Activity;
+import android.app.DatePickerDialog.OnDateSetListener;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -22,14 +23,14 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 
-public class FragmentProgressReportHeader extends Fragment {
+public class FragmentProgressReportHeader extends Fragment implements OnDateSetListener {
 
-	DialogFragmentDate dateFragment;
 	Calendar now = Calendar.getInstance();
 
 	public static String TAG = "FragmentProgressReportHeader";
@@ -144,25 +145,15 @@ public class FragmentProgressReportHeader extends Fragment {
 
 		dateButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				FragmentTransaction ft = getFragmentManager().beginTransaction(); //get the fragment
-				dateFragment = DialogFragmentDate.newInstance(getActivity(), new DialogFragmentDateListener(){
-					public void updateChangedDate(int year, int month, int day){
-						final Button dateButton = (Button) getView().findViewById(R.id.dailyProgressDateButton);
-						dateButton.setText(String.valueOf(day)+"/"+String.valueOf(month+1)+"/"+String.valueOf(year));
-						now.set(year, month, day);
-						thisReport.setReportDate(String.valueOf(day)+"/"+String.valueOf(month+1)+"/"+String.valueOf(year));
-					}
-				}, now);
-
-				dateFragment.show(ft, "DateDialogFragment");
+				showDatePickerDialog(v);
 			}
 		});
 
 	}
-
-	public interface DialogFragmentDateListener{
-		//this interface is a listener between the Date Dialog fragment and the activity to update the buttons date
-		public void updateChangedDate(int year, int month, int day);
+	
+	public void showDatePickerDialog(View V) {
+		DialogFragment newFragment = new DialogFragmentDate(this, now);
+		newFragment.show(getFragmentManager(), "datePicker");
 	}
 
 	public void updateSpinner(Spinner projectsSpinner) {
@@ -246,6 +237,15 @@ public class FragmentProgressReportHeader extends Fragment {
 			reportsDatasource.updateReport(thisReport);
 			reportsDatasource.close();			
 		}
+	}
+
+	@Override
+	public void onDateSet(DatePicker view, int year, int monthOfYear,
+			int dayOfMonth) {
+		final Button dateButton = (Button) getView().findViewById(R.id.dailyProgressDateButton);
+		dateButton.setText(String.valueOf(dayOfMonth)+"/"+String.valueOf(monthOfYear+1)+"/"+String.valueOf(year));
+		now.set(year, monthOfYear, dayOfMonth);
+		thisReport.setReportDate(String.valueOf(dayOfMonth)+"/"+String.valueOf(monthOfYear+1)+"/"+String.valueOf(year));
 	}
 
 }

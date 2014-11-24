@@ -11,8 +11,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.bugsense.trace.BugSenseHandler;
-
 import uk.co.simon.app.adapters.AdapterImages;
 import uk.co.simon.app.filesAndSync.FileManager;
 import uk.co.simon.app.sqllite.DataSourceLocations;
@@ -52,6 +50,8 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.splunk.mint.Mint;
+
 public class DialogFragmentReportItem extends DialogFragment {
 
 	private static final int REQ_CODE_PICK_IMAGE = 100;
@@ -77,7 +77,7 @@ public class DialogFragmentReportItem extends DialogFragment {
 
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
 		mContext = getActivity(); 
-		BugSenseHandler.initAndStartSession(mContext, "6c6b0664");
+		Mint.initAndStartSession(mContext, "6c6b0664");
 		projectId = getArguments().getLong("projectId");
 		AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 		LayoutInflater inflater = getActivity().getLayoutInflater();
@@ -342,9 +342,9 @@ public class DialogFragmentReportItem extends DialogFragment {
 						src.close();
 						dst.close();
 					} catch (FileNotFoundException e) {
-						BugSenseHandler.sendEvent(e.toString());
+						Mint.logEvent(e.toString());
 					} catch (IOException e) {
-						BugSenseHandler.sendEvent(e.toString());
+						Mint.logEvent(e.toString());
 					}
                 }
 				

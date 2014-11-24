@@ -25,7 +25,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.bugsense.trace.BugSenseHandler;
+import com.splunk.mint.Mint;
 
 public class ActivityReports extends FragmentActivity {
 
@@ -36,7 +36,7 @@ public class ActivityReports extends FragmentActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		BugSenseHandler.initAndStartSession(ActivityReports.this, "6c6b0664");
+		Mint.initAndStartSession(ActivityReports.this, "6c6b0664");
 		setContentView(R.layout.activity_reports);
 		setTitle(R.string.title_activity_reports);
 

@@ -11,7 +11,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 
-import com.bugsense.trace.BugSenseHandler;
+import com.splunk.mint.Mint;
 
 public class ActivitySettings extends PreferenceActivity {
     
@@ -22,7 +22,7 @@ public class ActivitySettings extends PreferenceActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-		BugSenseHandler.initAndStartSession(ActivitySettings.this, "6c6b0664");
+		Mint.initAndStartSession(ActivitySettings.this, "6c6b0664");
         addPreferencesFromResource(R.xml.preferences);
         Preference imagePicker = (Preference) findPreference("imagePicker");
         imagePicker.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {

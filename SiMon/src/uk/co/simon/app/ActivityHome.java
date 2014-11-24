@@ -19,7 +19,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.bugsense.trace.BugSenseHandler;
+import com.splunk.mint.Mint;
 
 public class ActivityHome extends Activity {
 
@@ -28,7 +28,7 @@ public class ActivityHome extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		BugSenseHandler.initAndStartSession(ActivityHome.this, "6c6b0664");
+		Mint.initAndStartSession(ActivityHome.this, "6c6b0664");
 		setContentView(R.layout.activity_home); 
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		context = this;

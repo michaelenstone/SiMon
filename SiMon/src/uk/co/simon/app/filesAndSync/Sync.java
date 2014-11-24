@@ -41,7 +41,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
 
-import com.bugsense.trace.BugSenseHandler;
+import com.splunk.mint.Mint;
 
 public class Sync {
 
@@ -62,7 +62,7 @@ public class Sync {
 		try {
 			wp = new SiMonWordpress(mEmail, mPassword, "http://www.simon-app.com/xmlrpc.php");
 		} catch (MalformedURLException e) {
-			BugSenseHandler.sendEvent(e.toString());
+			Mint.logEvent(e.toString());
 		}		
 	}
 
@@ -100,10 +100,10 @@ public class Sync {
 					context.startActivity(login);
 					return false;
 				}
-				BugSenseHandler.sendEvent(e.toString());
+				Mint.logEvent(e.toString());
 				return false;
 			} catch (Exception e) {
-				BugSenseHandler.sendEvent(e.toString());
+				Mint.logEvent(e.toString());
 				SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
 				SharedPreferences.Editor editor = sharedPref.edit();
 				editor.putString("ErrorPref", context.getString(R.string.msgSyncFail) );
@@ -211,7 +211,7 @@ public class Sync {
 					context.startActivity(login);
 					return false;
 				}
-				BugSenseHandler.sendEvent(e.toString());
+				Mint.logEvent(e.toString());
 			}
 			datasource.close();
 			return true;
@@ -245,7 +245,7 @@ public class Sync {
 					context.startActivity(login);
 					return false;
 				}
-				BugSenseHandler.sendEvent(e.toString());
+				Mint.logEvent(e.toString());
 			}
 			return reportItemsSync(report);
 		} else {
@@ -281,7 +281,7 @@ public class Sync {
 						context.startActivity(login);
 						return false;
 					}
-					BugSenseHandler.sendEvent(e.toString());
+					Mint.logEvent(e.toString());
 				}
 			}
 			datasourceReportItems.close();
@@ -334,9 +334,9 @@ public class Sync {
 							datasource.updatePhoto(photo);
 						}
 					} catch (ClientProtocolException e) {
-						BugSenseHandler.sendEvent(e.toString());
+						Mint.logEvent(e.toString());
 					} catch (IOException e) {
-						BugSenseHandler.sendEvent(e.toString());
+						Mint.logEvent(e.toString());
 					}
 				}
 			}
@@ -378,9 +378,9 @@ public class Sync {
 				}
 				
 			} catch (ClientProtocolException e) {
-				BugSenseHandler.sendEvent(e.toString());
+				Mint.logEvent(e.toString());
 			} catch (IOException e) {
-				BugSenseHandler.sendEvent(e.toString());
+				Mint.logEvent(e.toString());
 			}
 			return true;
 		} else {
